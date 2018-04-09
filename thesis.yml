@@ -1,0 +1,9 @@
+---
+title: Bachelor's Thesis
+subtitle: Migrating an Open Source Application to the Java 9 Module System
+author: Florian Beetz
+degree: Software Systems Science
+date: \today
+
+bibliography: bibliography/references.bib
+---

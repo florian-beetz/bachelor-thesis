@@ -1,0 +1,13 @@
+before_install:
+- sudo apt-get update && sudo apt-get install --no-install-recommends texlive-fonts-recommended
+  texlive-latex-extra texlive-fonts-extra texlive-latex-recommended dvipng pandoc
+  pandoc-citeproc latexmk texlive-bibtex-extra biber
+script:
+- make
+deploy:
+  provider: releases
+  api_key:
+    secure: dUoe7TM/UdeH0g1R2o3C25/CY2nLYhD784bjM9NhiZmVi0xDnskPNDo7y2lguRFm68hM9vM1wuPh/+SDVMqT1h4bnCnlb5adxUBbrmZ0ZwzjefT8wzSXyJBFqtN2wrPxnobBO4aCOLOsIMDjuKKvY37025/l36WQqisNORwD/Oeu5kZLT3EZJ9PWrV+vTiTA1mAgr5AlE8zpZVOMdchOk1vlHiZT4tN+78GvgaQtS3eGT7fPq02Yv9cG96+VxFoVu3uWYUGcWeH34xs0lAJuhJl0GxJmEUpvIOJHnIXTSevD2Z0zOgV6TLCds/PSYNYGYmhp1edlq5cOzhVUFNvtniYzBGPToWXvS3eB9MHvMilCS5nzAd6Iyhv8Gz46d74OvIj181ybwteI+doupglEqMOP8ylG8BISCJP4WfJ5eEkevHido8nfpOBm3JCnQJPQ42LkCn8rEqp6tCLsNOexT+qVkI/6BY/fNOsvuZgLKPyOZ3im6odMioRHb2uddcURf/ivKEKlT8qpN1x7w4A/ePTTCGMzcqhMv3htdeT0Ttv5anPvMb94fKW1cCwcTXRl5RMaX9Ui5DJSAHX8x6Tr9tiC1hAwjpg226Oc5mBz1ah0HR+DbvE+5dj0lHqQw88cYq1TBdqgo9S0mqIQV3upFOrvVd5xws2swr9yTBqbO9I=
+  file: thesis.pdf
+  on:
+    tags: true
