@@ -1,0 +1,57 @@
+% Configuration
+\input{includes/config.tex}
+\input{includes/pandoc.tex}
+
+\addbibresource{bibliography/references.bib}
+%
+\begin{document}
+%
+% Titlepage
+\maketitle{Bachelor's Thesis}{Software Systems Science}{Migrating an Open Source Application to the Java 9 Module System}{Florian Beetz}{\today}
+%
+% TOCs
+\pagenumbering{Roman}
+\tableofcontents
+\newpage
+\fancyhead[LO]{\footnotesize\sc\nouppercase{\leftmark}}
+\setcounter{page}{1}
+\pagenumbering{arabic}
+%
+% Insert your chapters here
+%
+\hypertarget{introduction}{%
+\section{Introduction}\label{introduction}}
+
+\hypertarget{background}{%
+\section{Background}\label{background}}
+
+\hypertarget{java-programming-language}{%
+\subsection{Java Programming Language}\label{java-programming-language}}
+
+The Java programming language was developed by Sun Microsystems under
+the name Oak in 1991 \autocite{Oracle2015}. Oak was designed to be
+processor-independent and should be used in consumer electronics. In
+1992 the industry had little interest in Oak, so the developers switched
+to bringing the language to the internet. The WebRunner browser was
+released in 1994, being the first browser supporting moving objects and
+dynamic executable content. Due to trademark issues Oak was renamed to
+Java in 1995. In the same year the developers of the Netscape Navigator
+browser announced that they will include Java support. The first version
+of Java was then released in 1996.
+
+\hypertarget{jabref-bibliography-manager}{%
+\subsection{JabRef Bibliography
+Manager}\label{jabref-bibliography-manager}}
+
+JabRef is an open source bibliography reference manager using the
+standard LaTeX bibliography format BibTex as its native file format. The
+project is hosted on GitHub\footnote{https://github.com/JabRef/jabref}
+and currently has over 200 contributors and around 140,000 lines of Java
+code.
+\newpage
+
+%\addcontentsline{toc}{chapter}{Appendix}
+
+\printbibliography[heading=bibintoc]
+
+\end{document}
