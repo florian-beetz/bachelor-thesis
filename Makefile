@@ -12,7 +12,7 @@ $(NAME).html:
 	pandoc -o $@ --filter=pandoc-citeproc $(FILES)
 
 $(NAME).tex: $(FILES) $(TEMPLATE)
-	pandoc -o $@ --biblatex --template $(TEMPLATE) --listing --filter=pandoc-citeproc $(FILES)
+	pandoc -o $@ --biblatex -M cref=true --template $(TEMPLATE) -F pandoc-crossref -F pandoc-citeproc $(FILES)
 
 
 clean:

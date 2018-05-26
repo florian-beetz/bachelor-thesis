@@ -1,7 +1,10 @@
+language: haskell
 before_install:
 - sudo apt-get update && sudo apt-get install --no-install-recommends texlive-fonts-recommended
   texlive-latex-extra texlive-fonts-extra texlive-latex-recommended dvipng pandoc
   pandoc-citeproc latexmk texlive-bibtex-extra biber lmodern
+- cabal update
+- cabal install pandoc-crossref
 before_script:
 - pandoc --version
 - latexmk -version

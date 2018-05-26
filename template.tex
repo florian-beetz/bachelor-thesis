@@ -2,6 +2,10 @@
 \input{includes/config.tex}
 \input{includes/pandoc.tex}
 
+$for(header-includes)$
+$header-includes$
+$endfor$
+
 \addbibresource{$bibliography$}
 %
 \begin{document}
