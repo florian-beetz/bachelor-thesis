@@ -1,5 +1,7 @@
 # Introduction
 
+**To do**
+
 # Background
 
 ## Java Programming Language
@@ -12,9 +14,9 @@ Due to trademark issues Oak was renamed to Java in 1995.
 In the same year the developers of the Netscape Navigator browser announced that they will include Java support. 
 The first version of Java was then released in 1996.
 
-Today Java is primarily used in server applications and the mobile operating system Android, but can also be used for developing regular desktop applications [citation needed].
+Today Java is primarily used in server applications and the mobile operating system Android, but can also be used for developing regular desktop applications [**citation needed**].
 
-The wide adoption of Java can be explained by it being mostly platform independent [citation needed]. Java programs does not run directly on hardware, but on a *Java Virtual Machine* (JVM), so Java can be run on any platform that has a JVM available.
+The wide adoption of Java can be explained by it being mostly platform independent [**citation needed**]. Java programs does not run directly on hardware, but on a *Java Virtual Machine* (JVM), so Java can be run on any platform that has a JVM available.
 
 ## Java Platform Module System
 
@@ -40,5 +42,24 @@ JPMS makes three principles, that before were only best practices, explicit [@Ma
 
 JabRef is an open source bibliography reference manager using the standard LaTeX bibliography format BibTex as its native file format.
 The project is hosted on GitHub^[https://github.com/JabRef/jabref] and currently has over 200 contributors and around 140,000 lines of Java code.
+
+**More info on JabRef: Begin of development? Wide adoption. JabRef Survey? etc.**
+
+# Migrating JabRef to Java 9
+
+The following section covers the process of migrating JabRef from Java 8 to Java 9. 
+Due to the open source nature of JabRef development of the project continued during the migration phase.
+Therefore the migration was done in an iterative approach and changes to the current version were continuously synchronized to the Java 9 version.
+
+## Compile-Time Compatibility
+
+In the first iteration the focus lay on compile-time compatibility.
+Incompatible parts of JabRef were temporarily removed.
+
+**To do**
+
+# Conclusion
+
+**To do**
 
 # References
