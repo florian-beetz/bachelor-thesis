@@ -53,10 +53,24 @@ Therefore the migration was done in an iterative approach and changes to the cur
 
 ## Compile-Time Compatibility
 
-In the first iteration the focus lay on compile-time compatibility.
+In the first iteration the focus lay on ensuring compile-time compatibility with Java 9.
 Incompatible parts of JabRef were temporarily removed.
 
-```{#test .java caption="asdf fdsa" captionpos="b"}
+A number of external libraries were incompatible with Java 9 and also had to be removed.
+The incompatibilities of these libraries can be categorized into the following categories:
+
+Libraries with *split packages* are two or more libraries that export the same package.
+Split packages across libraries cause errors such as the one shown in [@lst:split-pkg-err].
+
+```{#lst:split-pkg-err caption="Compiler error on split packages"}
+error: the unnamed module reads package com.sun.star.security from both unoil and ridl
+error: the unnamed module reads package com.sun.star.task from both unoil and ridl
+error: the unnamed module reads package com.sun.star.util from both unoil and ridl
+error: the unnamed module reads package com.sun.star.script from both unoil and ridl
+error: the unnamed module reads package com.sun.star.uno from both jurt and ridl
+```
+
+```{#test .java caption="asdf fdsa"}
 open module org.jabref {
   requires com.google.common;
 }
