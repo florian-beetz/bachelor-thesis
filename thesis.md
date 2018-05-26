@@ -56,6 +56,12 @@ Therefore the migration was done in an iterative approach and changes to the cur
 In the first iteration the focus lay on compile-time compatibility.
 Incompatible parts of JabRef were temporarily removed.
 
+```{#test .java caption="asdf fdsa" captionpos="b"}
+open module org.jabref {
+  requires com.google.common;
+}
+```
+
 **To do**
 
 # Conclusion
