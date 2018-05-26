@@ -14,20 +14,20 @@ The first version of Java was then released in 1996.
 
 Today Java is primarily used in server applications and the mobile operating system Android, but can also be used for developing regular desktop applications [citation needed].
 
-The wide adoption of Java can be explaind by it being mostly platform idependent [citation needed]. Java programs does not run directly on hardware, but on a *Java Virtual Machine* (JVM), so Java can be run on any platform that has a JVM available.
+The wide adoption of Java can be explained by it being mostly platform independent [citation needed]. Java programs does not run directly on hardware, but on a *Java Virtual Machine* (JVM), so Java can be run on any platform that has a JVM available.
 
 ## Java Platform Module System
 
 The Java Platform Module System (JPMS) -- also popular under its working name Jigsaw -- was the recent addition to the Java platform in version 9.
-JPMS adds *modules*, which are identifyable artifacts containing code, to the Java language [@Mac2017].
+JPMS adds *modules*, which are identifiable artifacts containing code, to the Java language [@Mac2017].
 
 Modularizing the *Java Development Kit* (JDK) was initially proposed in 2014 and planned to be released with Java 7 [@Reinhold2017].
 The motivation of the proposal was to allow scaling the JDK down to smaller devices by making the Java platform configurable to include only required modules for applications.
 
-JPMS makes three principles, that before were only best practices, ecplicit [@Mac2017]:
+JPMS makes three principles, that before were only best practices, explicit [@Mac2017]:
 
 * By using *strong encapsulation* parts of libraries can be hidden from other modules.
-  This clearly seperates code that is part of a public application programming interface (API) and code that is intended for internal use only.
+  This clearly separates code that is part of a public application programming interface (API) and code that is intended for internal use only.
   Consequently internal code can also change freely without worrying about backwards compatibility.
 * Strong encapsulation also leads to *well-defined interfaces*.
   By having to explicitly declare code that is intended for external usage, maintainers of libraries have to handle their API with great care, as changing this code can also break modules depending on it.
