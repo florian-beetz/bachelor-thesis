@@ -6,4 +6,12 @@ degree: Software Systems Science
 date: \today
 
 bibliography: bibliography/references.bib
+
+cref: true
+figPrefix: figure
+eqnPrefix: equation
+tblPrefix: table
+lstPrefix: listing
+secPrefix: section
+chapDelim: chapter
 ---

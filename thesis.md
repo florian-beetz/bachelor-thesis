@@ -62,17 +62,14 @@ The incompatibilities of these libraries can be categorized into the following c
 Libraries with *split packages* are two or more libraries that export the same package.
 Split packages across libraries cause errors such as the one shown in [@lst:split-pkg-err].
 
-```{#lst:split-pkg-err caption="Compiler error on split packages"}
-error: the unnamed module reads package com.sun.star.security from both unoil and ridl
-error: the unnamed module reads package com.sun.star.task from both unoil and ridl
-error: the unnamed module reads package com.sun.star.util from both unoil and ridl
-error: the unnamed module reads package com.sun.star.script from both unoil and ridl
-error: the unnamed module reads package com.sun.star.uno from both jurt and ridl
+```{#lst:split-pkg-err .c caption="Compiler error on split packages"}
+error: the unnamed module reads package com.sun.star.security from both 
+unoil and ridl
 ```
 
-```{#test .java caption="asdf fdsa"}
+```{#lst:module-desc .java caption="Module descriptor"}
 open module org.jabref {
-  requires com.google.common;
+    requires com.google.common;
 }
 ```
 
