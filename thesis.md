@@ -89,23 +89,61 @@ Incompatible parts of JabRef were temporarily removed.
 A number of external libraries were incompatible with Java 9 and also had to be 
 removed.
 The incompatibilities of these libraries can be categorized into the following 
-categories:
+categories.
+
+### Split Packages
 
 Libraries with *split packages* are two or more libraries that export the same 
+package as shown in [@fig:split_packages].
+Here, both modules export the packages `splitpackage` and 
+`splitpackage.internal`. 
+
+![Two modules containing the same packages but different classes [@Mac2017]](images/split_packages.svg){#fig:split_packages}
+
+JPMS allows only one module to export a given package to another module 
+[@Mac2017].
+If split packages were allowed, this would lead to inconsistencies in the
+encapsulation, as Java has a special visibility level for classes in the same
 package.
-Split packages across libraries cause errors such as the one shown in 
-[@lst:split-pkg-err].
+It also could become unclear which class should be used, if two modules contain
+classes with the exact same fully qualified name.
+
+Split packages across libraries cause runtime or compile-time errors such as the 
+one shown in [@lst:split-pkg-err].
 
 ```{#lst:split-pkg-err .c caption="Compiler error on split packages"}
-error: the unnamed module reads package com.sun.star.security from both 
-unoil and ridl
+error: the unnamed module reads package splitpackage from both module.one 
+and module.two
+error: the unnamed module reads package splitpackage.internal from both
+module.one and module.two
 ```
+
+In this initial iteration of the migration, libraries and their features were
+simply removed from JabRef.
+
+### Internal API Access
+
+**To do**
+
+### Module Descriptor
+
+**To do**
 
 ```{#lst:module-desc .java caption="Module descriptor"}
 open module org.jabref {
     requires com.google.common;
 }
 ```
+
+### Java Generics
+
+**To do**
+
+## Upgrading Libraries
+
+**To do**
+
+# Modularizing JabRef
 
 **To do**
 

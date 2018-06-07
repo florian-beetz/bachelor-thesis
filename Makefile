@@ -2,7 +2,7 @@ NAME = thesis
 
 FILES = $(NAME).yml $(NAME).md
 TEMPLATE = template
-FILTERS = -F pandoc-crossref -F pandoc-citeproc
+FILTERS = -F "filters/pandoc-svg.py" -F pandoc-crossref -F pandoc-citeproc
 
 all: clean $(NAME).pdf $(NAME).html
 
