@@ -15,6 +15,12 @@ $(NAME).html: $(FILES) $(TEMPLATE).html5
 $(NAME).tex: $(FILES) $(TEMPLATE).tex
 	pandoc -o $@ --biblatex --template $(TEMPLATE).tex $(FILTERS) $(FILES)
 
+graphics:
+	@for svg in `find images/*.svg`;	\
+	do									\
+		inkscape --export-pdf=$${svg%%.*}.pdf $$svg; \
+		inkscape --export-png=$${svg%%.*}.png $$svg; \
+	done;
 
 clean:
 	rm -f *.pdf 
