@@ -231,9 +231,11 @@ JPMS replaces dashes and underscores with dots in the name.
 JabRef uses several Scala dependencies, which follow the default Scala naming
 scheme consisting of the name of the project followed by an underscore followed
 by the Scala version.
-So an artifact with the name `latex2unicode_2.11` results in the module name 
-`latex2unicode.2.12`, which is not a valid module name as the 2 directly follows
-a dot.
+So an artifact with the name `latex2unicode` for Scala 2.11 results in an 
+artifact with the name `latex2unicode_2.12`. 
+As a module with no module descriptor and no automatic module name, its name is 
+interpreted to be `latex2unicode.2.12`, which is invalid as the 2 directly 
+follows a dot.
 
 The Scala dependencies were also temporarily removed for the first iteration.
 
