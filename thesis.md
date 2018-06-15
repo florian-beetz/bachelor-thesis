@@ -20,15 +20,15 @@ they will include Java support.
 The first version of Java was then released in 1996.
 
 Today Java is primarily used in server applications and the mobile operating 
-system Android, but can also be used for developing regular desktop applications
-[**citation needed**].
+system Android, but can also be used for developing regular desktop 
+applications.
 
 The wide adoption of Java can be explained by it being mostly platform 
-independent [**citation needed**]. Java programs does not run directly on 
-hardware, but on a *Java Virtual Machine* (JVM), so Java can be run on any 
-platform that has a JVM available.
+independent. Java programs does not run directly on hardware, but on a 
+*Java Virtual Machine* (JVM), so Java can be run on any platform that has a 
+JVM available.
 
-## Java Platform Module System
+## Java Platform Module System {#sec:jpms}
 
 The Java Platform Module System (JPMS) -- also popular under its working name 
 Jigsaw -- was the recent addition to the Java platform in version 9.
@@ -187,7 +187,7 @@ dependencies with split packages and disable the features of JabRef using them.
 ### Internal API Access
 
 Java's JDK consists of the public API but also some internal parts that should
-only be used by the JDK itself [**citation needed**].
+only be used by the JDK itself [@Clark2017].
 Oracle has warned developers repeatedly that no guarantee is given that the
 internal parts of the JDK stay available in future versions and can change 
 without further announcement.
@@ -219,7 +219,23 @@ This allows all reflective access into JabRef from any module.
 
 ### Module Names
 
-**To do**
+As mentioned in [@sec:jpms] if no module descriptor and no 
+`Automatic-Module-Name` is declared, JPMS tries to derive a module name from the
+filename of the artifact.
+However, JPMS also places some restrictions on module names, so they have to be
+a valid Java identifier and thus can only contain letters, numbers, underscores
+and the dollar sign in addition to dots, but may not start with numbers after a
+dot.
+JPMS replaces dashes and underscores with dots in the name.
+
+JabRef uses several Scala dependencies, which follow the default Scala naming
+scheme consisting of the name of the project followed by an underscore followed
+by the Scala version.
+So an artifact with the name `latex2unicode_2.11` results in the module name 
+`latex2unicode.2.12`, which is not a valid module name as the 2 directly follows
+a dot.
+
+The Scala dependencies were also temporarily removed for the first iteration.
 
 ### Module Descriptor {#sec:module-descriptor}
 
