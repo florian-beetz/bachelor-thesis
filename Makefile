@@ -10,7 +10,7 @@ $(NAME).pdf: $(NAME).tex
 	latexmk -interaction=nonstopmode -pdf $(NAME).tex
 
 $(NAME).html: $(FILES) $(TEMPLATE).html5
-	pandoc -o $@ --template $(TEMPLATE).html5 --csl=lncs.csl $(FILTERS) $(FILES)
+	pandoc -o $@ --self-contained --template $(TEMPLATE).html5 --csl=lncs.csl $(FILTERS) $(FILES)
 
 $(NAME).tex: $(FILES) $(TEMPLATE).tex
 	pandoc -o $@ --biblatex --template $(TEMPLATE).tex $(FILTERS) $(FILES)
