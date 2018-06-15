@@ -105,7 +105,8 @@ dependencies of `org.provider.othermodule`.
 The last two declarations identify that the module uses a service
 `org.thirdparty.module.Service` provided by some other class and implements a
 service `com.company.module.api.Service` with the class 
-`com.company.module.api.impl.ServiceImpl` for usage by other modules. This
+`com.company.module.api.impl.
+ServiceImpl` for usage by other modules. This
 declaration of services was already a feature of Java before version 9, but
 relied on a fragile configuration using text files.
 
