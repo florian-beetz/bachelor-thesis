@@ -128,8 +128,9 @@ filename of the artifact as a module name.
 
 JabRef is an open source bibliography reference manager using the standard LaTeX
 bibliography format BibTeX as its native file format.
-The project is hosted on GitHub^[https://github.com/JabRef/jabref] and currently
-has over 200 contributors and around 140,000 lines of Java code.
+The project is hosted on 
+GitHub^[[https://github.com/JabRef/jabref](https://github.com/JabRef/jabref)] 
+and currently has over 200 contributors and around 140,000 lines of Java code.
 
 **More info on JabRef: Begin of development? Wide adoption. JabRef Survey? etc.**
 
@@ -155,7 +156,7 @@ removed.
 The incompatibilities of these libraries can be categorized into the following 
 categories.
 
-### Split Packages
+### Split Packages {#sec:iter1-split}
 
 Libraries with *split packages* are two or more libraries that export the same 
 package as shown in [@fig:split_packages].
@@ -218,7 +219,7 @@ declaring the newly added `org.jabref` module as an *open module*
 (see [@sec:module-descriptor]). 
 This allows all reflective access into JabRef from any module.
 
-### Module Names
+### Module Names {#sec:iter1-name}
 
 As mentioned in [@sec:jpms] if no module descriptor and no 
 `Automatic-Module-Name` is declared, JPMS tries to derive a module name from the
@@ -292,6 +293,110 @@ Not much work was done on JabRef itself, but the contact with library
 maintainers and participation in their open source projects was the main
 objective.
 
+### LibreOffice
+
+LibreOffice is a free open source office suite and also provides a software
+development kit for other applications to interface with it.
+JabRef uses the LibreOffice SDK to insert citations and references into 
+LibreOffice documents.
+However, the SDK consists of multiple artifacts all exporting the same package
+`com.sun.star`, so they are incompatible with JPMS due to a split package
+(see [@sec:iter1-split]). 
+Thus the complete SDK and JabRef's functionality to interface with LibreOffice
+was temporarily removed.
+
+Possible long-term solutions include bundling all artifacts as one artifact, so
+the LibreOffice SDK is no longer modular, but requires consumers to load all of
+it. 
+The problem of the split package however would be solved, as the SDK is then
+only one module to export the package.
+Another solution could be to rename the packages contained in each artifact,
+this however would break backwards-compatibility of the SDK.
+
+[@tbl:lo-split] shows the development on the bug 
+report^[[https://bugs.documentfoundation.org//show_bug.cgi?id=117331](https://bugs.documentfoundation.org//show_bug.cgi?id=117331)] created for 
+the split package in the bug tracker of the Document Foundation, the maintainer 
+of LibreOffice.
+
+| Date          | Action                                                       |
+| ------------- | ------------------------------------------------------------ |
+| 2018-04-29    | Bug Report Created                                           |
+| 2018-06-07    | Bug Confirmed by another user                                |
+
+: Timeline of the bug report of the split package in LibreOffice {#tbl:lo-split}
+
+**To Do: DevCall what to do?**
+
+### Latex2Unicode
+
+The library latex2unicode is used by JabRef to display strings formatted using
+LaTeX to regular Unicode text.
+This library is written in Scala and has dependencies on three other Scala
+libraries.
+As briefly shown in [@sec:iter1-name] Scala's default naming scheme generates
+invalid automatic module names, so latex2unicode had to be temporarily removed
+in iteration one.
+
+Since Scala does not yet support JPMS, the solution of this problem is to
+explicitly provide an `Automatic-Module-Name` attribute in the libraries
+manifest (see [@sec:jpms]).
+This was proposed to the library maintainer of 
+latex2unicode^[[https://github.com/tomtung/latex2unicode/pull/11](https://github.com/tomtung/latex2unicode/pull/11)]
+and to the maintainers of the dependent libraries 
+fastparse^[[https://github.com/lihaoyi/fastparse/pull/185](https://github.com/lihaoyi/fastparse/pull/185)]
+and sourcecode^[[https://github.com/lihaoyi/sourcecode/pull/49](https://github.com/lihaoyi/sourcecode/pull/49)]
+in the form of code contributions -- so called pull requests -- to their 
+libraries.
+
+[@tbl:l2u-split] shows the timeline of the bug report for latex2unicode.
+The maintainer of the dependencies fastparse and sourcecode remained 
+unresponsive to the proposed fixes both provided on 2018-05-18 as of writing.
+
+| Date          | Action                                                       |
+| ------------- | ------------------------------------------------------------ |
+| 2018-04-28    | Bug report created                                           |
+| 2018-05-18    | Code contribution provided                                   |
+| 2018-05-29    | Proposed fix accepted by library maintainer                  |
+| 2018-xx-xx    | Version including fix published                              |
+
+: Timeline of the bug report for latex2unicode {#tbl:l2u-split}
+
+**To Do: What to do, DevCall**
+
+### Microsoft ApplicationInsights
+
+In order to gain some insight on user behavior and to be able to reproduce 
+errors users encounter, JabRef uses the monitoring service Microsoft 
+ApplicationInsights.
+ApplicationInsights follows the practice to distribute so called fat JARs --
+Java artifacts including all required dependencies -- but additionally relocate
+the packages of dependencies under their own package prefix.
+So their dependency on Google Guava using the package `com.google.common` is
+distributed in ApplicationInsights as 
+`com.microsoft.applicationinsights.core.dependencies.googlecommon`.
+
+However, Guava also exports the package `com.google.thirdparty`.
+This package was not correctly relocated in ApplicationInsights, causing a 
+split package conflict with JabRef's dependency on Google Guava.
+
+The problem was reported to the library maintainers of ApplicationInsights^[[https://github.com/Microsoft/ApplicationInsights-Java/issues/661](https://github.com/Microsoft/ApplicationInsights-Java/issues/661)].
+[@tbl:ai-split] shows the timeline of the bug report.
+
+| Date          | Action                                                       |
+| ------------- | ------------------------------------------------------------ |
+| 2018-05-05    | Bug Report Created                                           |
+| 2018-06-08    | Bug fixed by maintainers of the library                      |
+| 2018-xx-xx    | Version including fix published                              |
+
+: Timeline of the bug report of missed package relocation in Google Guava {#tbl:ai-split}
+
+### SVG Library
+
+**To do: instead of updating, replaced with JFX capabilities**
+
+### Other
+
+**To do: Guava JSR305, ArchUnit, Handlebars**
 
 # Modularizing JabRef
 
