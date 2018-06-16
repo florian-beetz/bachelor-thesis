@@ -127,11 +127,13 @@ filename of the artifact as a module name.
 ## JabRef Bibliography Manager
 
 JabRef is an open source bibliography reference manager using the standard LaTeX
-bibliography format BibTex as its native file format.
+bibliography format BibTeX as its native file format.
 The project is hosted on GitHub^[https://github.com/JabRef/jabref] and currently
 has over 200 contributors and around 140,000 lines of Java code.
 
 **More info on JabRef: Begin of development? Wide adoption. JabRef Survey? etc.**
+
+**To do: this is also the place to include the high level architecture of JabRef**
 
 # Migrating JabRef to Java 9
 
@@ -183,7 +185,7 @@ module.one and module.two
 The solution for the first iteration of the migration was to simply remove the
 dependencies with split packages and disable the features of JabRef using them.
 
-### Internal API Access
+### Internal API Access {#sec:iter1-internal}
 
 Java's JDK consists of the public API but also some internal parts that should
 only be used by the JDK itself [@Clark2017].
@@ -240,21 +242,56 @@ The Scala dependencies were also temporarily removed for the first iteration.
 
 ### Module Descriptor {#sec:module-descriptor}
 
-**To do**
+As a result of the first iteration also a module descriptor was created for
+JabRef (see [@sec:jpms]).
+While it would have been possible to make JabRef an automatic module, instead of
+an explicit one, there were already efforts for creating a descriptor due to the
+open source nature of JabRef.
+
+[@lst:jabref-module] shows an excerpt from the module descriptor. 
+As already mentioned in [@sec:iter1-internal], the module was declared as open 
+module to allow all internal access into JabRef.
+The architecture of JabRef is based around an event bus, implemented by the
+Guava library, which makes extensive use of reflection.
 
 ```{#lst:jabref-module .java caption="JabRef module"}
 open module org.jabref {
-    requires com.google.common;
+    exports org.jabref;
+
+    exports org.jabref.gui;
+    // [...]
+
+    // SQL
+    requires java.sql;
+    requires postgresql;
+
+    // JavaFX
+    requires javafx.graphics;
+    requires javafx.swing;
+
+    // [...]
+
+    provides com.airhacks.afterburner.views.ResourceLocator
+        with org.jabref.gui.util.JabRefResourceLocator;
+    
+    provides com.airhacks.afterburner.injection.PresenterFactory
+        with org.jabref.gui.DefaultInjector;
+
+    // [...]
 }
 ```
 
-### Java Generics
-
-**To do**
+For future iterations it was planned to explicitly specify the packages that are
+accessed via reflection on to declare only them as open.
 
 ## Upgrading Libraries
 
-**To do**
+In the second iteration the focus lay on updating the libraries removed in
+iteration one to versions that are compatible with Java 9.
+Not much work was done on JabRef itself, but the contact with library 
+maintainers and participation in their open source projects was the main
+objective.
+
 
 # Modularizing JabRef
 

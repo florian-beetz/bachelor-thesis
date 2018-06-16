@@ -8,10 +8,10 @@ date: 19.08.2018
 bibliography: bibliography/references.bib
 
 cref: true
-figPrefix: figure
-eqnPrefix: equation
-tblPrefix: table
-lstPrefix: listing
-secPrefix: section
-chapDelim: chapter
+figPrefix: Figure
+eqnPrefix: Equation
+tblPrefix: Table
+lstPrefix: Listing
+secPrefix: Section
+chapDelim: Chapter
 ---
