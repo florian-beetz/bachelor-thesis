@@ -28,3 +28,8 @@ deploy:
     - thesis.pdf
     - thesis.html
   skip_cleanup: true
+
+notifications:
+  email:
+    on_success: never
+    on_failure: always
