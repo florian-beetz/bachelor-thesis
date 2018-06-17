@@ -390,9 +390,35 @@ The problem was reported to the library maintainers of ApplicationInsights^[[htt
 
 : Timeline of the bug report of missed package relocation in Google Guava {#tbl:ai-split}
 
-### SVG Library
+### JavaFxSVG
 
-**To do: instead of updating, replaced with JFX capabilities**
+JavaFxSVG is a library that allows the GUI framework JavaFX to display SVG
+graphics.
+This functionality was used at only one occasion -- to display the JabRef logo
+in an About dialog -- so in agreement with the JabRef developers the library
+was removed and replaced with JavaFX's native capabilities.
+
+![JabRef logo](images/jabref.svg){#fig:jabref width=100px height=100px}
+
+JavaFX does not support the full set of features of the SVG definition, but it
+has support for its so called paths specifying vertices of geometric shapes.
+JabRef's logo consists of six such paths as shown in [@fig:jabref]. The solution
+was to overlay the paths in order to recreate the complete image (see [@lst:logo-fxml]).
+
+```{#lst:logo-fxml .xml caption="Rendering of JabRef logo with JavaFX"}
+<StackPane onMouseClicked="#openJabrefWebsite" scaleX="0.6" scaleY="0.6" 
+    prefWidth="140" prefHeight="140" BorderPane.alignment="CENTER">
+    <!-- SVGPaths need to be wrapped in a Pane to get them to the same 
+    size -->
+    <Pane prefHeight="350" prefWidth="350" styleClass="logo-pane">
+        <SVGPath content="M97.2 87.1C93.2 33.8 18.4 14.6 18.2 ..." />
+    </Pane>
+    <Pane prefHeight="350" prefWidth="350" styleClass="logo-pane">
+        <SVGPath content="M96.2 61.2C92.8 19.2 35.1 0.4 35 ..." />
+    </Pane>
+    <!-- ... -->
+</StackPane>
+```
 
 ### Other
 
@@ -405,5 +431,24 @@ The problem was reported to the library maintainers of ApplicationInsights^[[htt
 # Conclusion
 
 **To do**
+
+```{#lst:java-test .java caption="Remove me"}
+import java.util.Map;
+import java.util.TreeSet;
+ 
+public class GetEnv {
+  /**
+   * let's test generics
+   * @param args the command line arguments
+   */
+  public static void main(String[] args) {
+    // get a map of environment variables
+    Map<String, String> env = System.getenv();
+    // build a sorted set out of the keys and iterate
+    for(String k: new TreeSet<String>(env.keySet())) {
+      System.out.printf("%s = %s\n", k, env.get(k));
+    }
+  }    }
+```
 
 # References

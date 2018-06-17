@@ -4,4 +4,6 @@
 
 Bachelor's thesis.
 
-Build with `make`, requires LaTeX, pandoc and pandoc-citeproc.
+Build with `make`, requires LaTeX, pandoc with pandoc-citeproc and pandoc-crossref and Python 3.
+
+Generate PNG and PDF images from SVGs with `make graphics` (required for PDF creation).
