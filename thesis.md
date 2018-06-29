@@ -424,6 +424,10 @@ was to overlay the paths in order to recreate the complete image (see [@lst:logo
 
 **To do: Guava JSR305, ArchUnit, Handlebars**
 
+## Reworking JabRef's Threading Model
+
+**To do: Removal of Spin, change to future-based approach of background tasks**
+
 # Modularizing JabRef
 
 **To do**
