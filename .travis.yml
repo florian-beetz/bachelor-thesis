@@ -27,6 +27,7 @@ deploy:
   file: 
     - thesis.pdf
     - thesis.html
+    - thesis-eis.pdf
   skip_cleanup: true
 
 notifications:

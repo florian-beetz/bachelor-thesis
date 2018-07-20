@@ -4,7 +4,7 @@ FILES = $(NAME).yml $(NAME).md
 TEMPLATE = template
 FILTERS = -F "filters/pandoc-svg.py" -F pandoc-crossref -F pandoc-citeproc
 
-all: clean $(NAME).pdf $(NAME).html
+all: $(NAME).pdf $(NAME).html $(NAME)-eis.pdf
 
 $(NAME).pdf: $(NAME).tex
 	latexmk -interaction=nonstopmode -pdf $(NAME).tex
@@ -14,6 +14,12 @@ $(NAME).html: $(FILES) $(TEMPLATE).html5
 
 $(NAME).tex: $(FILES) $(TEMPLATE).tex
 	pandoc -o $@ --biblatex --template $(TEMPLATE).tex $(FILTERS) $(FILES)
+
+$(NAME)-eis.tex: $(FILES) eisvogel.latex
+	pandoc -o $@ --biblatex --template eisvogel.latex $(FILTERS) eisvogel.yml $(FILES)
+
+$(NAME)-eis.pdf: $(NAME)-eis.tex
+	latexmk -interaction=nonstopmode -pdf $(NAME)-eis.tex
 
 graphics:
 	@for svg in `find images/*.svg`;	\
@@ -27,3 +33,4 @@ clean:
 	rm -f *.html
 	latexmk -c *.tex
 	rm -f $(NAME).tex
+	rm -f $(NAME)-eis.tex
