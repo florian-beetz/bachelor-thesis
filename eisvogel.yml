@@ -7,6 +7,6 @@ titlepage-rule-height: 1
 header-includes:
 - \usepackage{draftwatermark}
 - \usepackage{transparent}
-- \SetWatermarkText{\transparent{0.4}\includegraphics{img/ub.eps}}
+- \SetWatermarkText{\transparent{0.4}\includegraphics{img/ub.pdf}}
 - \SetWatermarkScale{4}
 ...
