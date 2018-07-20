@@ -1,8 +1,51 @@
 # Introduction
 
+> Everything changes and nothing stands still.
+> 
+> -- *Heraclitus*
+
 **To do**
 
 # Background
+
+## Software Migration
+
+Software migration is a part of software maintenance [@Malton2001]. In general
+software maintenance can be classified as adaptive, corrective, perfective, and
+preventive maintenance tasks. Within this classification, software migration is
+an adaptive maintenance task: Adapting existing software to a new environment
+or platform.
+
+The need to perform a software migration usually arises, because the current 
+platform or environment is obsolete or poorly supported, or from features 
+available only in newer versions of a platform [@Malton2001].
+
+Software migration tasks can be grouped into three general classes:
+
+* **Dialect conversion** is required when the underlying compiler technology
+  changes to a new version of the compiler or a new compiler family 
+  [@Malton2001]. Usually successive versions of compilers aim at being backwards
+  compatible, even when new features were added, in large code bases, however,
+  additional effort is required to use new versions of compilers.
+
+* **API migration** is the process of changing a dependency on an external
+  application programming interface (API) to another one or a different version
+  [@Malton2001].
+
+  Similar to other software, libraries that provide an API evolve over time, to
+  introduce new features, fix bugs, and refactor source code [@Xavier2017].
+  APIs establish a contract with the clients, that rely on them, hence APIs
+  should have a high stability to minimize effort for clients when updating to
+  a newer version.
+  However, not all changes in APIs are breaking the previously established
+  contract, changes that do are referred to as *breaking changes*.
+
+  Breaking changes mainly are modification or removal of existing API
+  elements [@Brito2018]. Adding new API elements are rarely braking changes.
+
+* **Language migration** is the decision to convert an existing program to a new
+  language [@Malton2001]. This is a risky type of migration, as it requires much
+  effort to re-express source code in a different language.
 
 ## Java Programming Language
 
