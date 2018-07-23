@@ -47,7 +47,9 @@ Software migration tasks can be grouped into three general classes:
   language [@Malton2001]. This is a risky type of migration, as it requires much
   effort to re-express source code in a different language.
 
-## Java Programming Language
+**To do: Approaches**
+
+## Java 9
 
 The Java programming language was originally developed by Sun Microsystems under 
 the name Oak in 1991 [@Oracle2015].
@@ -62,14 +64,18 @@ In the same year the developers of the Netscape Navigator browser announced that
 they will include Java support. 
 The first version of Java was then released in 1996.
 
-Today Java is primarily used in server applications and the mobile operating 
-system Android, but can also be used for developing regular desktop 
-applications.
+Java has a very good history of being backwards compatible with previous 
+releases [@Marx2016; @Oracle2018; @Oracle2018a; @Oracle2018b; @Oracle2018c; @Oracle2018d; @Oracle2018e; @Oracle2018f].
+According to Oracle, incompatibilities usually occur only in rarely used edge-
+cases, or when new keywords were introduced in the language, such as `strictfp`
+in Java 2, `assert` in Java 4 and `enum` in Java 5, which subsequently can no
+longer be used as identifiers.
 
-The wide adoption of Java can be explained by it being mostly platform 
-independent. Java programs does not run directly on hardware, but on a 
-*Java Virtual Machine* (JVM), so Java can be run on any platform that has a 
-JVM available.
+With Java 9 the *Java Platform Module System* (JPMS) -- also popular under its
+working name *Jigsaw* -- was introduced the the Java platform.
+Oracle claims, that code that uses only official Java APIs should work without
+changes, but some third-party libraries may need to be upgraded [@Oracle2018g].
+
 
 ## Java Platform Module System {#sec:jpms}
 
