@@ -9,4 +9,5 @@ header-includes:
 - \usepackage{transparent}
 - \SetWatermarkText{\transparent{0.4}\includegraphics{img/ub.pdf}}
 - \SetWatermarkScale{4}
+- \usepackage{wasysym}
 ...
