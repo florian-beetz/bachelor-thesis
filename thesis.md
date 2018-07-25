@@ -113,7 +113,10 @@ type name is the same, the first one found is used [@Kothagal2017]. This problem
 most often occurs when different versions of the same libraries are put on the 
 classpath and is referred to as *JAR hell*. As classes are loaded lazily this
 problems might not even be noticed on startup of an application, but only when
-it was running for some time and a class is used for the first time.
+it was running for some time and a class is used for the first time. Thus
+reliable configuration of the classpath is difficult and explains the rise of
+tools like Maven or Gradle, that standardize the process of obtaining 
+dependencies and configuring Java to use them [@Kothagal2017].
 
 Access modifier | Class    | Package  | Subclass | Unrestricted
 ----------------|----------|----------|----------|--------------
@@ -124,6 +127,8 @@ Access modifier | Class    | Package  | Subclass | Unrestricted
 
 : Access modifiers and their associated scopes [@Mac2017] {#tbl:access}
 
+JPMS aims at exactly these needs of large Java applications: reliable 
+configuration and strong encapsulation [@Clark2017].
 
 
 Oracle claims, that code that uses only official Java APIs should work without
@@ -426,7 +431,13 @@ of LibreOffice.
 
 : Timeline of the bug report of the split package in LibreOffice {#tbl:lo-split}
 
-**To Do: DevCall what to do?**
+As the developers of LibreOffice were unresponsive to the bug report, a possible
+workaround to the problem would be to manually repackage the artifacts to a
+single one as proposed above. However, doing this without support of the 
+original developers would complicate the build process of JabRef, because the
+patched artifact would need to be shipped with the source code instead of
+downloading the dependencies from a central Maven repository as it is done for
+other dependencies.
 
 ### Latex2Unicode
 
@@ -450,8 +461,6 @@ in the form of code contributions -- so called pull requests -- to their
 libraries.
 
 [@tbl:l2u-split] shows the timeline of the bug report for latex2unicode.
-The maintainer of the dependencies fastparse and sourcecode remained 
-unresponsive to the proposed fixes both provided on 2018-05-18 as of writing.
 
 | Date          | Action                                                       |
 | ------------- | ------------------------------------------------------------ |
@@ -462,7 +471,14 @@ unresponsive to the proposed fixes both provided on 2018-05-18 as of writing.
 
 : Timeline of the bug report for latex2unicode {#tbl:l2u-split}
 
-**To Do: What to do, DevCall**
+The maintainer of the dependencies fastparse and sourcecode remained 
+unresponsive to the proposed fixes both provided on 2018-05-18 as of writing.
+Possible solutions to work around the problem include providing a manually 
+patched version of the libraries or using a service such as 
+Jitpack^[[https://jitpack.io](https://jitpack.io)] to build the versions 
+including provided code contribution. Jitpack allows developers to publish
+versions of their libraries directly from a Git repository without additional
+configuration.
 
 ### Microsoft ApplicationInsights
 
@@ -525,9 +541,45 @@ was to overlay the paths in order to recreate the complete image (see [@lst:logo
 
 **To do: Guava JSR305, ArchUnit, Handlebars**
 
-## Reworking JabRef's Threading Model
+## Reworking JabRef's Threading Mod
 
-**To do: Removal of Spin, change to future-based approach of background tasks**
+The third iteration of migrating JabRef to Java 9 consisted in reworking parts
+of its threading model. The rework was required because JabRef used the library
+"Spin" to simplify interaction of the GUI with long-running background tasks.
+Spin provides utilities to load off time-intensive operations to a separate
+thread, so that the GUI stays responsive to user input.
+
+This is done by creating proxy objects that run their operations on a separate
+thread, but wait until their execution has finished, while keeping the GUI 
+thread responsive (see [@fig:spin]).
+
+![Model of Spin [@Meier2007]](images/spin.svg){#fig:spin}
+
+However, the JabRef developers are in the process of migrating from the Swing
+GUI framework, that Spin was written for, to the newer GUI framework JavaFX.
+This migration process already lead to some threading issues, because often GUI
+frameworks restrict programmatic interactions with GUI frameworks to be only
+allowed on the GUI thread. This migration process made the usage of Spin 
+obsolete, as it does not work with JavaFX.
+
+The solution to this problem was to adapt the approach of JabRef, that was 
+already employed in parts of the application. JabRef uses an callback based
+approach partly provided by the JavaFX framework itself.
+This approach provides a class `BackgroundTask` that wraps time consuming 
+operations and provides means to specify callbacks that are executed on the GUI
+thread once the operations succeeds, fails or either of the two.
+
+```{#lst:background_task .java caption="Usage of background tasks"}
+BackgroundTask.wrap(this::verifyDuplicates)
+              .onSuccess(this::handleDuplicates)
+              .executeWith(Globals.TASK_EXECUTOR);
+```
+
+[@lst:background_task] shows how background tasks are used in JabRef. The
+method `verifyDuplicates` is executed on a thread of the `Globals.TASK_EXECUTOR`
+executor service. When the verification of duplicates succeeds the method
+`handleDuplicates` is called on the JavaFX GUI thread, failures are not handled
+in this case.
 
 # Modularizing JabRef
 
