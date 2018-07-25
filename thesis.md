@@ -43,7 +43,7 @@ Software migration tasks can be grouped into three general classes:
   Breaking changes mainly are modification or removal of existing API
   elements [@Brito2018]. Adding new API elements are rarely braking changes.
 
-  Usually libraries also contain code that is indented only for implementing the
+  Usually libraries also contain code that is intended only for implementing the
   services offered by an API, but not for public consumption [@Dig2006].
   Many languages do not provide features to explicitly mark such elements as
   internal, but library authors rely solely on naming conventions, e.g. placing
@@ -130,6 +130,25 @@ Access modifier | Class    | Package  | Subclass | Unrestricted
 JPMS aims at exactly these needs of large Java applications: reliable 
 configuration and strong encapsulation [@Clark2017].
 
+Modules have to explicitly declare which packages they make available to other
+modules and which modules they are dependent on [@Mac2017].
+Packages that are not exported by a module can not be used in other modules.
+This clearly separates public API from code that is intended for internal use 
+only. Consequently internal code can also change freely without worrying about 
+introducing breaking changes.
+
+From the declaration of dependencies a so-called module graph 
+([@fig:module_graph]) can be derived to identify dependencies of modules.
+The nodes of the graph represent the modules of the application, the dark blue
+edges represent the explicitly declared dependencies, while the light blue 
+edges represent the implicit dependency of every module on the Java base module 
+`java.base` [@Reinhold2016].
+
+![Module Graph [@Reinhold2016]](images/module_graph.png){#fig:module_graph}
+
+Java 9 resolves modules every time before an application is compiled or executed 
+[@Kothagal2017]. Thus, it is possible to catch configuration errors like 
+missing modules or multiple modules with the same name directly at startup.
 
 Oracle claims, that code that uses only official Java APIs should work without
 changes, but some third-party libraries may need to be upgraded [@Oracle2018g].
@@ -541,7 +560,7 @@ was to overlay the paths in order to recreate the complete image (see [@lst:logo
 
 **To do: Guava JSR305, ArchUnit, Handlebars**
 
-## Reworking JabRef's Threading Mod
+## Reworking JabRef's Threading Model
 
 The third iteration of migrating JabRef to Java 9 consisted in reworking parts
 of its threading model. The rework was required because JabRef used the library
