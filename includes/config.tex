@@ -20,10 +20,21 @@
 \usepackage{hyperref}
 \usepackage{cleveref}
 \usepackage{longtable, booktabs}
+\usepackage{wasysym}
 
 \usepackage[english]{babel}
 \usepackage{csquotes}
 \usepackage[backend=biber,style=numeric]{biblatex}
+
+% redefinition of floats to ht floats
+\usepackage{float}
+\let\origfigure\figure
+\let\endorigfigure\endfigure
+\renewenvironment{figure}[1][2] {
+    \expandafter\origfigure\expandafter[ht]
+} {
+    \endorigfigure
+}
 
 % use upquote if available, for straight quotes in verbatim environments
 \IfFileExists{upquote.sty}{\usepackage{upquote}}{}
@@ -114,7 +125,7 @@
 \end{minipage}
 \hfill
 \begin{minipage}{3cm}
-    \includegraphics[height=26mm]{includes/UB-Logo-neu_blau-cmyk}
+    \includegraphics[height=26mm]{includes/UB-Logo-neu_blau-cmyk.pdf}
 \end{minipage}
 \end{minipage}\\[130pt]
 {\LARGE #1}\\[24pt]

@@ -18,7 +18,7 @@ fmt_to_option = {
     #use PNG because EMF and WMF break transparency
     "docx": ("--export-png", "png"),
     #because of IE
-    "html": ("--export-png", "png")
+    "html": ("--export-png", "svg")
 }
 
 def svg_to_any(key, value, fmt, meta):

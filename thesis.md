@@ -10,11 +10,11 @@
 
 ## Software Migration
 
-Software migration is a part of software maintenance [@Malton2001]. In general
-software maintenance can be classified as adaptive, corrective, perfective, and
-preventive maintenance tasks. Within this classification, software migration is
-an adaptive maintenance task: Adapting existing software to a new environment
-or platform.
+Software migration is a part of software maintenance [@Dig2006]. 
+In general software maintenance can be classified as adaptive, corrective, 
+perfective, and preventive maintenance tasks [@Malton2001]. 
+Within this classification, software migration is an adaptive maintenance task: 
+Adapting existing software to a new environment or platform.
 
 The need to perform a software migration usually arises, because the current 
 platform or environment is obsolete or poorly supported, or from features 
@@ -42,6 +42,12 @@ Software migration tasks can be grouped into three general classes:
 
   Breaking changes mainly are modification or removal of existing API
   elements [@Brito2018]. Adding new API elements are rarely braking changes.
+
+  Usually libraries also contain code that is indented only for implementing the
+  services offered by an API, but not for public consumption [@Dig2006].
+  Many languages do not provide features to explicitly mark such elements as
+  internal, but library authors rely solely on naming conventions, e.g. placing
+  code in an `internal` namespace. 
 
 * **Language migration** is the decision to convert an existing program to a new
   language [@Malton2001]. This is a risky type of migration, as it requires much
@@ -72,10 +78,56 @@ in Java 2, `assert` in Java 4 and `enum` in Java 5, which subsequently can no
 longer be used as identifiers.
 
 With Java 9 the *Java Platform Module System* (JPMS) -- also popular under its
-working name *Jigsaw* -- was introduced the the Java platform.
+working name *Jigsaw* -- was introduced the the Java platform among other minor
+changes. 
+JPMS adds *modules*, which are identifiable artifacts containing code, to the 
+Java language [@Mac2017].
+
+Before Java 9, artifacts were usually distributed as *Java archives* (JARs)
+[@Kothagal2017]. Java has a concept of a classpath, which is a path in the
+file system Java searches for compiled code required at runtime or compilation.
+[@fig:classpath] shows a schematic image of a classpath as it would be specified
+to Java. This classpath has 4 JAR files on it, each containing several packages.
+The white rectangles symbolize classes in the packages.
+
+![Unresolved Classpath before Java 9 [@Kothagal2017]](images/classpath.svg){#fig:classpath}
+
+Before Java 9, the information of how packages and classes are organized was
+ignored by Java [@Kothagal2017]. Java resolves classes on demand when they are
+first required. [@fig:classpath_resolved] shows the information that is 
+available to Java. All contents of the JARs on the classpath are seen as if it
+were only one artifact.
+
+![Resolved Classpath before Java 9 [@Kothagal2017]](images/classpath_resolved.svg){#fig:classpath_resolved}
+
+This way of handing loading of classes led to several problems: The first one
+being accessibility [@Kothagal2017]. Every code artifact can essentially use
+code of every other artifacts, as long as classes or members are not restricted
+with the existing access modifiers (see [@tbl:access]). This can make dependency
+relations unclear for large code bases and violates strong encapsulation 
+principles.
+
+This becomes even more problematic with the second problem: If more than one 
+type exists with the same fully qualified name, i.e. the package name and the 
+type name is the same, the first one found is used [@Kothagal2017]. This problem 
+most often occurs when different versions of the same libraries are put on the 
+classpath and is referred to as *JAR hell*. As classes are loaded lazily this
+problems might not even be noticed on startup of an application, but only when
+it was running for some time and a class is used for the first time.
+
+Access modifier | Class    | Package  | Subclass | Unrestricted
+----------------|----------|----------|----------|--------------
+`public`        | \checked | \checked | \checked | \checked
+`protected`     | \checked | \checked | \checked |
+- *(default)*   | \checked | \checked |          |
+`private`       | \checked |          |          |
+
+: Access modifiers and their associated scopes [@Mac2017] {#tbl:access}
+
+
+
 Oracle claims, that code that uses only official Java APIs should work without
 changes, but some third-party libraries may need to be upgraded [@Oracle2018g].
-
 
 ## Java Platform Module System {#sec:jpms}
 
