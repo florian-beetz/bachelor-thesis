@@ -7,7 +7,7 @@ FILTERS = -F "filters/pandoc-svg.py" -F pandoc-crossref -F pandoc-citeproc
 all: $(NAME).pdf $(NAME).html
 
 $(NAME).pdf: $(NAME).tex
-	latexmk -xelatex -interaction=nonstopmode $(NAME).tex
+	latexmk -interaction=nonstopmode -pdf $(NAME).tex
 
 $(NAME).html: $(FILES) $(TEMPLATE).html5
 	pandoc -o $@ --self-contained --highlight-style tango --template $(TEMPLATE).html5 --csl=lncs.csl $(FILTERS) $(FILES)
