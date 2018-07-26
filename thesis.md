@@ -82,6 +82,7 @@ working name *Jigsaw* -- was introduced the the Java platform among other minor
 changes. 
 JPMS adds *modules*, which are identifiable artifacts containing code, to the 
 Java language [@Mac2017].
+The monolithic JDK itself was also split into smaller modules [@Clark2017].
 
 ### Advantages of Modules {#sec:j9_adv}
 
@@ -151,6 +152,8 @@ edges represent the implicit dependency of every module on the Java base module
 Java 9 resolves modules every time before an application is compiled or executed 
 [@Kothagal2017]. Thus, it is possible to catch configuration errors like 
 missing modules or multiple modules with the same name directly at startup.
+
+**To do: IoT applicability**
 
 ### Implementation of Modules
 
@@ -225,8 +228,49 @@ lose their consumers using older versions.
 
 Oracle claims, that code that uses only official Java APIs should work without
 changes, but some third-party libraries may need to be upgraded [@Oracle2018g].
+However, in reality there are some more constraints of the module system that 
+need consideration.
 
-**To do: restrictions of the module system**
+Firstly, due to the modularization of the JDK itself, internal APIs became
+unavailable [@Mac2017]. Those classes were always meant to be used only 
+internally by the JDK, but due to the missing access restrictions and missing
+alternatives, they have become adopted by some developers.
+
+For widely used internal classes the module `jdk.unsupported` is provided,
+so that backwards compatibility for applications depending on them is ensured,
+however it is planned that those classes are replaced with supported 
+alternatives in a future Java version [@Mac2017].
+
+While Java 9 still provides the possibility to explicitly make the internal APIs
+available with command line switches like `--add-exports`, the only long-term
+solution is to move away from those APIs and find supported replacement 
+solutions [@Inden2018]. Corresponding to that, the switch `--add-opens` exists
+for allowing reflection into packages of modules, that do not explicitly open
+packages.
+
+The second restriction is that modules are no longer allowed to have split
+packages [@Mac2017]. Split packages are packages with the same name, that are
+contained in two or more modules.
+[@fig:split_packages] shows two modules where both contain the packages 
+`splitpackage` and `splitpackage.internal`. 
+
+![Split Packages across several Modules](images/split_packages.svg){#fig:split_packages}
+
+If split packages were allowed, this would lead to inconsistencies in the
+encapsulation, as Java has a special visibility level for classes in the same
+package.
+It also could become unclear which class should be used, if two modules contain
+classes with the exact same fully qualified name.
+
+Split packages across libraries cause runtime or compile-time errors such as the 
+one shown in [@lst:split-pkg-err].
+
+```{#lst:split-pkg-err .c caption="Compiler error on split packages"}
+error: the unnamed module reads package splitpackage from both module.one 
+and module.two
+error: the unnamed module reads package splitpackage.internal from both
+module.one and module.two
+```
 
 ## JabRef Bibliography Manager
 
