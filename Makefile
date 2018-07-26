@@ -4,7 +4,7 @@ FILES = $(NAME).yml $(NAME).md
 TEMPLATE = template
 FILTERS = -F "filters/pandoc-svg.py" -F pandoc-crossref -F pandoc-citeproc
 
-all: $(NAME).pdf $(NAME).html
+all: $(NAME).pdf
 
 $(NAME).pdf: $(NAME).tex
 	latexmk -interaction=nonstopmode -pdf $(NAME).tex
