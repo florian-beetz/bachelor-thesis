@@ -55,7 +55,7 @@ Software migration tasks can be grouped into three general classes:
 
 **To do: Approaches**
 
-## Java 9
+## Java 9 {#sec:j9}
 
 The Java programming language was originally developed by Sun Microsystems under 
 the name Oak in 1991 [@Oracle2015].
@@ -82,6 +82,8 @@ working name *Jigsaw* -- was introduced the the Java platform among other minor
 changes. 
 JPMS adds *modules*, which are identifiable artifacts containing code, to the 
 Java language [@Mac2017].
+
+### Advantages of Modules {#sec:j9_adv}
 
 Before Java 9, artifacts were usually distributed as *Java archives* (JARs)
 [@Kothagal2017]. Java has a concept of a classpath, which is a path in the
@@ -150,52 +152,13 @@ Java 9 resolves modules every time before an application is compiled or executed
 [@Kothagal2017]. Thus, it is possible to catch configuration errors like 
 missing modules or multiple modules with the same name directly at startup.
 
-Oracle claims, that code that uses only official Java APIs should work without
-changes, but some third-party libraries may need to be upgraded [@Oracle2018g].
+### Implementation of Modules
 
-## Java Platform Module System {#sec:jpms}
-
-The Java Platform Module System (JPMS) -- also popular under its working name 
-Jigsaw -- was the recent addition to the Java platform in version 9.
-JPMS adds *modules*, which are identifiable artifacts containing code, to the 
-Java language [@Mac2017].
-
-Modularizing the *Java Development Kit* (JDK) was initially proposed in 2014 
-and planned to be released with Java 7 [@Reinhold2017].
-The motivation of the proposal was to allow scaling the JDK down to smaller 
-devices by making the Java platform configurable to include only required 
-modules for applications.
-
-JPMS makes three principles, that before were only best practices, explicit 
-[@Mac2017]:
-
-* By using *strong encapsulation* parts of libraries can be hidden from other 
-  modules.
-  This clearly separates code that is part of a public application programming 
-  interface (API) and code that is intended for internal use only.
-  Consequently internal code can also change freely without worrying about 
-  backwards compatibility.
-* Strong encapsulation also leads to *well-defined interfaces*.
-  By having to explicitly declare code that is intended for external usage, 
-  maintainers of libraries have to handle their API with great care, as changing
-  this code can also break modules depending on it.
-* Modules also require *explicit declaration of dependencies* to use other 
-  modules.
-  From this declaration a module graph can be derived, where nodes represent 
-  modules and edges represent dependencies.
-  A module graph is important for understanding an application and also running 
-  it with all necessary modules.
-  It also allows for reliable configuration of the modules.
-
-Before Java 9 visibility of code could be restricted to classes not being
-visible from different packages and methods and fields of classes not being
-visible to different classes.
-JPMS now allows to restrict the visibility of entire packages to different 
-modules by explicitly declaring the packages that should be accessed by other
-modules.
-This is done with a so called module descriptor as shown in [@lst:module-desc], 
-that is required to be declared in a file called `module-info.java` in the root
-package of the module.
+To make use of JPMS in Java 9 a module has to declare its public packages and
+its dependencies as mentioned in [@sec:j9_adv]. This is done using a module
+descriptor, a file called `module-info.java` in the root package, that will be
+compiled as classes to a file called `module-info.class` [@Mac2017]. 
+[@lst:module-desc] shows an example of such a module descriptor.
 
 ```{#lst:module-desc .java caption="Module descriptor"}
 module com.company.module {
@@ -220,34 +183,50 @@ from other modules to its packages `com.company.module.api`,
 `com.company.module.cli` and `com.company.module.gui`. 
 Note however that although Java packages seem to appear hierarchical, they are
 treated like regular identifiers, so if access to subpackages of any of the
-above packages should be allowed, they would have to be explicitly be exported.
+above packages should be allowed, they would have to be explicitly be exported 
+[@Mac2017].
+
 The example module further "opens" the package `com.company.module.api.feature`
-to reflective access from other modules.
-It then declares its dependencies on `org.thirdparty.module` and 
+to reflective access from other modules. Reflective access is not granted by
+default, even if a package is exported [@Mac2017]. If a module relies heavily on
+reflection, it may also be declared as an `open module` to allow reflection into
+all its packages.
+
+The module then declares its dependencies on `org.thirdparty.module` and 
 `org.provider.othermodule`, with the second dependency being declared as
 transitive dependency. This means that the module also depends on all 
 dependencies of `org.provider.othermodule`.
+
 The last two declarations identify that the module uses a service
 `org.thirdparty.module.Service` provided by some other class and implements a
 service `com.company.module.api.Service` with the class 
 `com.company.module.api.impl.ServiceImpl` for usage by other modules. This
 declaration of services was already a feature of Java before version 9, but
-relied on a fragile configuration using text files.
+relied on a configuration using text files. The declaration of provided and used
+services is JPMS' form of dependency injection, also known as the principle
+*Inversion of Control* (IoC) that allows hiding of implementation details 
+[@Mac2017].
 
-Since such a module descriptor is a feature of Java 9, it also needs to be
-compiled with a Java 9 compiler or later. 
-However, due to the nature of the Java platform projects can not be run with a 
-previous version of Java than they were compiled with.
-This is unfavorable especially for developers of libraries, as for them 
-upgrading to Java 9 would force all consumers of their library to upgrade to
-Java 9.
-For such a use-case an alternative method to declare a module is implemented in
-JPMS: The attribute `Automatic-Module-Name` can be declared in an Java 
-artifact's manifest to set at least a module name.
-The module is then used as a so called automatic modules, which depends on all
-other available modules and exports all its packages.
-If even such an attribute is not provided, JPMS resorts to interpreting the
-filename of the artifact as a module name.
+As an alternative to the explicit declaration of a module descriptor, Java 9
+also allows the usage of so called *automatic modules* [@Mac2017]. Automatic
+Modules do not have a module descriptor, their name is derived from the 
+attribute `Automatic-Module-Name` in the JAR manifest `META-INF/MANIFEST.MF` or
+from the name of the JAR file if that attribute is not present.
+An automatic module has some special characteristics: It `requires transitive`
+all other resolved modules, exports all its packages and reads the classpath.
+This version of module declaration is favorable if the module has to maintain
+backwards compatibility with previous Java versions. Especially library 
+maintainers are often hesitant to migrate to the latest Java version to not
+lose their consumers using older versions.
+
+**To do: unnamed module**
+
+### Migrating to Modular Code
+
+Oracle claims, that code that uses only official Java APIs should work without
+changes, but some third-party libraries may need to be upgraded [@Oracle2018g].
+
+**To do: restrictions of the module system**
 
 ## JabRef Bibliography Manager
 
@@ -346,7 +325,7 @@ This allows all reflective access into JabRef from any module.
 
 ### Module Names {#sec:iter1-name}
 
-As mentioned in [@sec:jpms] if no module descriptor and no 
+As mentioned in [@sec:j9] if no module descriptor and no 
 `Automatic-Module-Name` is declared, JPMS tries to derive a module name from the
 filename of the artifact.
 However, JPMS also places some restrictions on module names, so they have to be
@@ -369,7 +348,7 @@ The Scala dependencies were also temporarily removed for the first iteration.
 ### Module Descriptor {#sec:module-descriptor}
 
 As a result of the first iteration also a module descriptor was created for
-JabRef (see [@sec:jpms]).
+JabRef (see [@sec:j9]).
 While it would have been possible to make JabRef an automatic module, instead of
 an explicit one, there were already efforts for creating a descriptor due to the
 open source nature of JabRef.
@@ -470,7 +449,7 @@ in iteration one.
 
 Since Scala does not yet support JPMS, the solution of this problem is to
 explicitly provide an `Automatic-Module-Name` attribute in the libraries
-manifest (see [@sec:jpms]).
+manifest (see [@sec:j9]).
 This was proposed to the library maintainer of 
 latex2unicode^[[https://github.com/tomtung/latex2unicode/pull/11](https://github.com/tomtung/latex2unicode/pull/11)]
 and to the maintainers of the dependent libraries 
