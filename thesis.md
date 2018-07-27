@@ -222,7 +222,11 @@ backwards compatibility with previous Java versions. Especially library
 maintainers are often hesitant to migrate to the latest Java version to not
 lose their consumers using older versions.
 
-**To do: unnamed module**
+The third variant of modules is the so-called *unnamed module* [@Inden2018]. In
+contrast to explicit modules and automatic modules, which are put on the 
+*modulepath*, the unnamed module consists of all code that is put on the
+classpath. The unnamed module is treated like code before Java 9. Automatic
+modules can access code in the unnamed module, while explicit modules cannot.
 
 ### Migrating to Modular Code
 
@@ -280,6 +284,8 @@ The project is hosted on
 GitHub^[[https://github.com/JabRef/jabref](https://github.com/JabRef/jabref)] 
 and currently has over 200 contributors and around 140,000 lines of Java code.
 
+![High-Level Architecture of JabRef](images/jabref_architecture.svg){#fig:approach}
+
 **More info on JabRef: Begin of development? Wide adoption. JabRef Survey? etc.**
 
 **To do: this is also the place to include the high level architecture of JabRef**
@@ -292,6 +298,8 @@ Due to the open source nature of JabRef development of the project continued
 during the migration phase.
 Therefore the migration was done in an iterative approach and changes to the
 current version were continuously synchronized to the Java 9 version.
+
+![Approach of the Migration](images/approach.svg){#img:approach}
 
 ## Compile-Time Compatibility
 
