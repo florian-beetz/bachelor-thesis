@@ -71,7 +71,7 @@ they will include Java support.
 The first version of Java was then released in 1996.
 
 Java has a very good history of being backwards compatible with previous 
-releases [@Marx2016; @Oracle2018; @Oracle2018a; @Oracle2018b; @Oracle2018c; @Oracle2018d; @Oracle2018e; @Oracle2018f].
+releases [@Marx2016; @Oracle2018d; @Oracle2018f; @Oracle2018; @Oracle2018a; @Oracle2018b; @Oracle2018c; @Oracle2018e].
 According to Oracle, incompatibilities usually occur only in rarely used edge-
 cases, or when new keywords were introduced in the language, such as `strictfp`
 in Java 2, `assert` in Java 4 and `enum` in Java 5, which subsequently can no
@@ -284,6 +284,7 @@ The project is hosted on
 GitHub^[[https://github.com/JabRef/jabref](https://github.com/JabRef/jabref)] 
 and currently has over 200 contributors and around 140,000 lines of Java code.
 
+
 ![High-Level Architecture of JabRef](images/jabref_architecture.svg){#fig:approach}
 
 **More info on JabRef: Begin of development? Wide adoption. JabRef Survey? etc.**
@@ -299,7 +300,20 @@ during the migration phase.
 Therefore the migration was done in an iterative approach and changes to the
 current version were continuously synchronized to the Java 9 version.
 
-![Approach of the Migration](images/approach.svg){#img:approach}
+[@fig:approach] shows the general approach of the migration. The approach is
+substantially different depending on whether the issue is located in an external
+dependency or in JabRef's codebase. When the issues were fixed in a future
+version, the solution simply consists of upgrading said dependency, otherwise
+the issues were reported to the maintainers of the respective libraries or a
+code contribution to their projects was created.
+
+![General Approach of the Migration](images/approach.svg){#fig:approach}
+
+Issues in JabRef internal code can be classified into access to now internal API
+and changes in the Java compiler. The only sustainable solution to those 
+problems is migrating away from the API and finding a supported replacement.
+Changes in the compiler are usually only minor, but require adaption of the 
+code.
 
 ## Compile-Time Compatibility
 
