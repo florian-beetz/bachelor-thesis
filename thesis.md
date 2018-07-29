@@ -164,7 +164,11 @@ Java 9 resolves modules every time before an application is compiled or executed
 [@Kothagal2017]. Thus, it is possible to catch configuration errors like 
 missing modules or multiple modules with the same name directly at startup.
 
-**To do: IoT applicability**
+Additionally due to the smaller modules, instead of one big runtime environment,
+Java 9 is better equipped to be run on devices for the Internet of Things (IoT)
+[@Inden2018]. Those devices often have heavy restrictions on storage space and
+now do no longer have to store the full runtime environments, but only those 
+parts that are required to run the respective application.
 
 ### Implementation of Modules
 
