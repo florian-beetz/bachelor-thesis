@@ -53,7 +53,18 @@ Software migration tasks can be grouped into three general classes:
   language [@Malton2001]. This is a risky type of migration, as it requires much
   effort to re-express source code in a different language.
 
-**To do: Approaches**
+The general approach for adaptive software maintenance consists of a sequence of
+steps as shown in [@fig:adaptive_maintenance].
+
+![Activities of Adaptive Software Maintenance [@Mayrhauser1995]](images/adaptive_approach.svg){#fig:adaptive_maintenance}
+
+Applied to a migration process, the sequence of steps consists of first
+understanding the system. Then the changes in the new environment or platform 
+need to be understood in order to understand the new requirements to the system.
+The next step is to develop a plan of how the new requirements can be 
+implemented in the system. Next, the planned changes can be implemented, which
+may require debugging. Lastly, regression tests should be ran, to ensure that
+the system is still completely functional in the new environment.
 
 ## Java 9 {#sec:j9}
 
