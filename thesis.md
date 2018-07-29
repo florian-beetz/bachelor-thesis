@@ -295,12 +295,28 @@ The project is hosted on
 GitHub^[[https://github.com/JabRef/jabref](https://github.com/JabRef/jabref)] 
 and currently has over 200 contributors and around 140,000 lines of Java code.
 
+According to a survey carried out in 2015 across its users, JabRef is most 
+commonly used by German, English and French speakers [@JabRefDevelopers2015]. It 
+is most commonly used in professional work, such as engineering and medicine and
+for studies, mostly from the field of natural sciences and formal sciences.
 
-![High-Level Architecture of JabRef](images/jabref_architecture.svg){#fig:approach}
+JabRef is built using a layered architecture as shown in [@fig:architecture] 
+[@JabRefDevelopers2017]. The shown components only depend on components lower in 
+the figure. The base of the architecture is the *Model* component, that 
+encapsulates the entities used in the application. Building on top of that 
+component is the *Logic* component, that contains all business logic. The 
+*Preferences* component provides the functionality to load and store user 
+defined settings. JabRef's command line interface is encapsulated in the *CLI* 
+component and the top layer is constituted by the graphical user interface in 
+the *GUI* component. Additionally, there exist some additional global classes, 
+that may be used anywhere in the application.
 
-**More info on JabRef: Begin of development? Wide adoption. JabRef Survey? etc.**
+![High-Level Architecture of JabRef](images/jabref_architecture.svg){#fig:architecture}
 
-**To do: this is also the place to include the high level architecture of JabRef**
+The communication between the components of JabRef is implemented using an event 
+bus, that allows publishing events and registering listeners for events. This 
+allows to react upon changes in the core and still react in the upper layers, 
+while keeping the components clearly separated.
 
 # Migrating JabRef to Java 9
 
