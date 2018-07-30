@@ -8,7 +8,7 @@
 
 # Background
 
-## Software Migration
+## Software Migration {#sec:migration}
 
 Software migration is a part of software maintenance [@Dig2006]. 
 In general software maintenance can be classified as adaptive, corrective, 
@@ -170,7 +170,7 @@ Java 9 is better equipped to be run on devices for the Internet of Things (IoT)
 now do no longer have to store the full runtime environments, but only those 
 parts that are required to run the respective application.
 
-### Implementation of Modules
+### Implementation of Modules {#sec:j9_impl}
 
 To make use of JPMS in Java 9 a module has to declare its public packages and
 its dependencies as mentioned in [@sec:j9_adv]. This is done using a module
@@ -243,7 +243,7 @@ contrast to explicit modules and automatic modules, which are put on the
 classpath. The unnamed module is treated like code before Java 9. Automatic
 modules can access code in the unnamed module, while explicit modules cannot.
 
-### Migrating to Modular Code
+### Migrating to Modular Code {#sec:j9_mig}
 
 Oracle claims, that code that uses only official Java APIs should work without
 changes, but some third-party libraries may need to be upgraded [@Oracle2018g].
@@ -291,7 +291,7 @@ error: the unnamed module reads package splitpackage.internal from both
 module.one and module.two
 ```
 
-## JabRef Bibliography Manager
+## JabRef Bibliography Manager {#sec:jabref}
 
 JabRef is an open source bibliography reference manager using the standard LaTeX
 bibliography format BibTeX as its native file format.
@@ -328,15 +328,16 @@ The following section covers the process of migrating JabRef from Java 8 to
 Java 9. 
 Due to the open source nature of JabRef development of the project continued 
 during the migration phase.
-Therefore the migration was done in an iterative approach and changes to the
-current version were continuously synchronized to the Java 9 version.
+Therefore the migration technique as shown in [@sec:migration] was applied in an 
+iterative approach and changes to the current version were continuously 
+synchronized to the Java 9 version.
 
 [@fig:approach] shows the general approach of the migration. The approach is
-substantially different depending on whether the issue is located in an external
+substantially different depending on whether an issue is located in an external
 dependency or in JabRef's codebase. When the issues were fixed in a future
-version, the solution simply consists of upgrading said dependency, otherwise
-the issues were reported to the maintainers of the respective libraries or a
-code contribution to their projects was created.
+version of a third-party library, the solution simply consists of upgrading said 
+dependency, otherwise the issues were reported to the maintainers of the 
+respective libraries or a code contribution to their projects was created.
 
 ![General Approach of the Migration](images/approach.svg){#fig:approach}
 
@@ -346,7 +347,7 @@ problems is migrating away from the API and finding a supported replacement.
 Changes in the compiler are usually only minor, but require adaption of the 
 code.
 
-## Compile-Time Compatibility
+## Compile-Time Compatibility {#sec:jr_mig}
 
 In the first iteration the focus lay on ensuring compile-time compatibility with
 Java 9.
@@ -357,104 +358,85 @@ removed.
 The incompatibilities of these libraries can be categorized into the following 
 categories.
 
-### Split Packages {#sec:iter1-split}
+First, four libraries exported the same packages, resulting in a split package
+as explained in [@sec:j9_mig]. These libraries were the popular utility library
+*Google Guava*, the SDK of the office suite *LibreOffice*, Microsoft's 
+monitoring service *ApplicationInsights* and *ArchUnit*, a test framework to
+check for architecture constraints.
 
-Libraries with *split packages* are two or more libraries that export the same 
-package as shown in [@fig:split_packages].
-Here, both modules export the packages `splitpackage` and 
-`splitpackage.internal`. 
+While Google Guava did not actually contain a split package, it had a 
+dependency on an unofficial implementation of Java annotations as specified by
+the Java Specification Request (JSR) 305, that aims at assisting tools to find
+software defects by providing annotations such as `@NonNull` [@Pugh2006]. 
+However, this dependency was optional and thus not required at runtime, so the 
+solution was to explicitly exclude it in the Gradle build script as shown in
+[@lst:jsr-exclusion]. 
 
-![Two modules containing the same packages but different classes [@Mac2017]](images/split_packages.svg){#fig:split_packages}
+```{#lst:jsr-exclusion .java caption="Exclusion of the JSR 305 dependency"}
+configurations {
+    // [...]
 
-JPMS allows only one module to export a given package to another module 
-[@Mac2017].
-If split packages were allowed, this would lead to inconsistencies in the
-encapsulation, as Java has a special visibility level for classes in the same
-package.
-It also could become unclear which class should be used, if two modules contain
-classes with the exact same fully qualified name.
-
-Split packages across libraries cause runtime or compile-time errors such as the 
-one shown in [@lst:split-pkg-err].
-
-```{#lst:split-pkg-err .c caption="Compiler error on split packages"}
-error: the unnamed module reads package splitpackage from both module.one 
-and module.two
-error: the unnamed module reads package splitpackage.internal from both
-module.one and module.two
+    compile {
+        exclude group: 'com.google.code.findbugs', module: 'jsr305'
+    }
+}
 ```
 
-The solution for the first iteration of the migration was to simply remove the
-dependencies with split packages and disable the features of JabRef using them.
+For ArchUnit a development version was already available, so it could simply be
+updated.
+The LibreOffice SDK and Microsoft ApplicationInsights were incompatible with
+Java 9, so for the first iteration, they were temporarily removed and the 
+features of JabRef depending on them disabled.
 
-### Internal API Access {#sec:iter1-internal}
+Second, the GUI libraries *Spin* and *ControlsFX* and JabRef itself used internal
+APIs in the JDK, that were no longer accessible. For the first iteration, the
+solution was to simply use the flags mentioned in [@sec:j9_mig] to allow the
+access to those libraries.
+[@lst:jr-args] shows the command line arguments required to run JabRef in the 
+first iteration.
 
-Java's JDK consists of the public API but also some internal parts that should
-only be used by the JDK itself [@Clark2017].
-Oracle has warned developers repeatedly that no guarantee is given that the
-internal parts of the JDK stay available in future versions and can change 
-without further announcement.
+```{#lst:jr-args .bash caption="Command Line Arguments Required to Run JabRef in Iteration 1"}
+java \
+    --illegal-access=debug \
+    --add-opens javafx.swing/javafx.embed.swing=org.jabref \
+    --add-opens java.desktop/java.awt=spin \
+    --add-opens javafx.controls/javafx.scene.control=org.jabref \
+    --add-exports javafx.base/com.sun.javafx.runtime=controlsfx \
+    -p . \
+    -m org.jabref/org.jabref.JabRefMain
+```
 
-With Java 9 this announcement is now implemented, as the modules of the JDK now
-simply only export the publicly available API and not the internal APIs.
-While Java 9 still provides the possibility to explicitly make the internal APIs
-available with command line switches like `--add-exports`, the only long-term
-solution is to move away from those APIs and find supported replacement 
-solutions.
+The third problem for compile-time compatibility were the module names of some
+dependencies. As mentioned in [@sec:j9_mig] Java first searches for a module
+descriptor, if it can not be found the `Automatic-Module-Name` attribute in the
+JAR manifest is consulted and if that is not present, Java derives a module name
+from the file name of the JAR file.
+However, module names underlie the same restrictions as Java packages, so they
+may contain dots, but each segment between two dots must be a valid Java 
+identifier.
 
-JPMS also requires modules to explicitly declare "open" packages that can be 
-used with Java's reflection mechanism. 
-This behavior can also be circumvented with the appropriate `--add-opens` 
-command line flag.
-
-JabRef did only make use of internal APIs at few occurrences, but uses third
-party libraries such as Google's Guava that make extensive use of reflection
-into other modules.
-Some of the used libraries also depended on JDK APIs that are no longer 
-publicly accessible.
-
-For the first iteration the access to internal APIs from third party libraries
-was allowed using the available command line switches.
-The problem of other modules using reflection to access JabRef was solved by
-declaring the newly added `org.jabref` module as an *open module* 
-(see [@sec:module-descriptor]). 
-This allows all reflective access into JabRef from any module.
-
-### Module Names {#sec:iter1-name}
-
-As mentioned in [@sec:j9] if no module descriptor and no 
-`Automatic-Module-Name` is declared, JPMS tries to derive a module name from the
-filename of the artifact.
-However, JPMS also places some restrictions on module names, so they have to be
-a valid Java identifier and thus can only contain letters, numbers, underscores
-and the dollar sign in addition to dots, but may not start with numbers after a
-dot.
-JPMS replaces dashes and underscores with dots in the name.
-
-JabRef uses several Scala dependencies, which follow the default Scala naming
+This was a problem for Scala dependencies that follow the default Scala naming
 scheme consisting of the name of the project followed by an underscore followed
 by the Scala version.
 So an artifact with the name `latex2unicode` for Scala 2.11 results in an 
-artifact with the name `latex2unicode_2.12`. 
-As a module with no module descriptor and no automatic module name, its name is 
-interpreted to be `latex2unicode.2.12`, which is invalid as the 2 directly 
-follows a dot.
+artifact with the name `latex2unicode_2.12.jar`. 
+For this, Java 9 derives the module name `latex2unicode.2.12`, which is an 
+invalid module name as the 2 directly follows a dot.
+For the first iteration the Scala dependency *latex2unicode*, which JabRef uses
+to resolve LaTeX commands to plain text, that had again dependencies on the 
+Scala libraries *fastparse* and *Sourcecode*, was temporarily removed.
 
-The Scala dependencies were also temporarily removed for the first iteration.
-
-### Module Descriptor {#sec:module-descriptor}
-
-As a result of the first iteration also a module descriptor was created for
-JabRef (see [@sec:j9]).
+Lastly, as a result of the first iteration also a module descriptor was created 
+for JabRef (see [@sec:j9_impl]).
 While it would have been possible to make JabRef an automatic module, instead of
 an explicit one, there were already efforts for creating a descriptor due to the
 open source nature of JabRef.
 
 [@lst:jabref-module] shows an excerpt from the module descriptor. 
-As already mentioned in [@sec:iter1-internal], the module was declared as open 
-module to allow all internal access into JabRef.
-The architecture of JabRef is based around an event bus, implemented by the
-Guava library, which makes extensive use of reflection.
+The module was declared as open module to allow all internal access into JabRef,
+because the architecture of JabRef (see [@sec:jabref]) is based around an 
+event bus provided by the Google Guava library, which makes extensive use of
+reflection.
 
 ```{#lst:jabref-module .java caption="JabRef module"}
 open module org.jabref {
@@ -483,26 +465,21 @@ open module org.jabref {
 }
 ```
 
-For future iterations it was planned to explicitly specify the packages that are
-accessed via reflection on to declare only them as open.
-
 ## Upgrading Libraries
 
 In the second iteration the focus lay on updating the libraries removed in
 iteration one to versions that are compatible with Java 9.
-Not much work was done on JabRef itself, but the contact with library 
+Not much work was done on JabRef itself, but getting in contact with library 
 maintainers and participation in their open source projects was the main
 objective.
 
 ### LibreOffice
 
-LibreOffice is a free open source office suite and also provides a software
-development kit for other applications to interface with it.
 JabRef uses the LibreOffice SDK to insert citations and references into 
 LibreOffice documents.
 However, the SDK consists of multiple artifacts all exporting the same package
 `com.sun.star`, so they are incompatible with JPMS due to a split package
-(see [@sec:iter1-split]). 
+(see [@sec:jr_mig]). 
 Thus the complete SDK and JabRef's functionality to interface with LibreOffice
 was temporarily removed.
 
@@ -536,17 +513,15 @@ other dependencies.
 
 ### Latex2Unicode
 
-The library latex2unicode is used by JabRef to display strings formatted using
-LaTeX to regular Unicode text.
-This library is written in Scala and has dependencies on three other Scala
+Latex2Unicode is written in Scala and has dependencies on three other Scala
 libraries.
-As briefly shown in [@sec:iter1-name] Scala's default naming scheme generates
+As briefly shown in [@sec:jr_mig] Scala's default naming scheme generates
 invalid automatic module names, so latex2unicode had to be temporarily removed
 in iteration one.
 
 Since Scala does not yet support JPMS, the solution of this problem is to
 explicitly provide an `Automatic-Module-Name` attribute in the libraries
-manifest (see [@sec:j9]).
+manifest (see [@sec:j9_impl]).
 This was proposed to the library maintainer of 
 latex2unicode^[[https://github.com/tomtung/latex2unicode/pull/11](https://github.com/tomtung/latex2unicode/pull/11)]
 and to the maintainers of the dependent libraries 
@@ -577,9 +552,6 @@ configuration.
 
 ### Microsoft ApplicationInsights
 
-In order to gain some insight on user behavior and to be able to reproduce 
-errors users encounter, JabRef uses the monitoring service Microsoft 
-ApplicationInsights.
 ApplicationInsights follows the practice to distribute so called fat JARs --
 Java artifacts including all required dependencies -- but additionally relocate
 the packages of dependencies under their own package prefix.
@@ -606,9 +578,11 @@ The problem was reported to the library maintainers of ApplicationInsights^[[htt
 
 JavaFxSVG is a library that allows the GUI framework JavaFX to display SVG
 graphics.
-This functionality was used at only one occasion -- to display the JabRef logo
-in an About dialog -- so in agreement with the JabRef developers the library
-was removed and replaced with JavaFX's native capabilities.
+The library exports the package `org.w3c.dom` which conflicts with APIs provided
+directly from the JDK.
+However, this functionality was used at only one occasion -- to display the 
+JabRef logo in an About dialog -- so in agreement with the JabRef developers the 
+library was removed and replaced with JavaFX's native capabilities.
 
 ![JabRef logo](images/jabref.svg){#fig:jabref width=100px height=100px}
 
@@ -631,10 +605,6 @@ was to overlay the paths in order to recreate the complete image (see [@lst:logo
     <!-- ... -->
 </StackPane>
 ```
-
-### Other
-
-**To do: Guava JSR305, ArchUnit, Handlebars**
 
 ## Reworking JabRef's Threading Model
 
