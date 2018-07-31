@@ -439,6 +439,35 @@ For the first iteration the Scala dependency *latex2unicode*, which JabRef uses
 to resolve LaTeX commands to plain text, that had again dependencies on the 
 Scala libraries *fastparse* and *Sourcecode*, was temporarily removed.
 
+Fourth, there were minor incompatibilities with the new compiler regarding the
+use of Java generics. The method `children()` in [@lst:compiler-before] returns
+an object of the type `Enumeration<TreeNode>`, before Java 9 however, it could
+be assigned to a variable of the type `Enumeration<CheckableTreeNode>` where
+`CheckableTreeNode` inherits `TreeNode`.
+
+```{#lst:compiler-before .java caption="Use of Generics before Java 9"}
+Enumeration<CheckableTreeNode> tmpChildren = this.children();
+for (CheckableTreeNode child : Collections.list(tmpChildren)) {
+    child.setSelected(bSelected);
+}
+```
+
+This direct conversion is no longer possible in Java 9. The returned object of
+`children()` is assigned to a variable of the correct type 
+`Enumeration<TreeNode>` in [@lst:compiler-after] and cast to the type 
+`CheckableTreeNode` on usage.
+
+```{#lst:compiler-after .java caption="Use of Generics after Java 9"}
+Enumeration<TreeNode> tmpChildren = this.children();
+for (TreeNode child : Collections.list(tmpChildren)) {
+    ((CheckableTreeNode) child).setSelected(bSelected);
+}
+```
+
+Several instances of that problem were found throughout JabRef's source code,
+however no documentation could be found that explains this change in the
+Java language.
+
 Lastly, as a result of the first iteration also a module descriptor was created 
 for JabRef (see [@sec:j9_impl]).
 While it would have been possible to make JabRef an automatic module, instead of
