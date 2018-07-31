@@ -80,8 +80,10 @@ Due to trademark issues Oak was renamed to Java in 1995.
 In the same year the developers of the Netscape Navigator browser announced that
 they will include Java support. 
 The first version of Java was then released in 1996.
+In 2009 Oracle acquired Sun and since then is the maintainer of the language
+[@Oracle2015].
 
-Java has a very good history of being backwards compatible with previous 
+Since then, Java has a very good history of being backwards compatible with previous 
 releases [@Marx2016; @Oracle2018d; @Oracle2018f; @Oracle2018; @Oracle2018a; @Oracle2018b; @Oracle2018c; @Oracle2018e].
 According to Oracle, incompatibilities usually occur only in rarely used edge-
 cases, or when new keywords were introduced in the language, such as `strictfp`
@@ -94,6 +96,12 @@ changes.
 JPMS adds *modules*, which are identifiable artifacts containing code, to the 
 Java language [@Mac2017].
 The monolithic JDK itself was also split into smaller modules [@Clark2017].
+
+Since Java 9 the release cycle has also adapted to a faster pace [@Reinhold2018].
+Beginning with Java 9, a feature release will be published every six months and
+long term support (LTS) releases will be released every three years. Because of 
+this, Java 9 is already superseded by Java 10 as of writing, and Java 11, the 
+next LTS release, is expected to be released in September 2018.
 
 ### Advantages of Modules {#sec:j9_adv}
 
