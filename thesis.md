@@ -330,6 +330,11 @@ bus, that allows publishing events and registering listeners for events. This
 allows to react upon changes in the core and still react in the upper layers, 
 while keeping the components clearly separated.
 
+The source code of JabRef is build using the tool Gradle. Gradle automates
+repeated tasks such as compilation of the source code, building release 
+distributions, resolving correct versions of dependencies, running tests and 
+generation of source code with parser generators.
+
 # Migrating JabRef to Java 9
 
 The following section covers the process of migrating JabRef from Java 8 to 
