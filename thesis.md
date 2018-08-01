@@ -665,9 +665,10 @@ thread responsive (see [@fig:spin]).
 However, the JabRef developers are in the process of migrating from the Swing
 GUI framework, that Spin was written for, to the newer GUI framework JavaFX.
 This migration process already lead to some threading issues, because often GUI
-frameworks restrict programmatic interactions with GUI frameworks to be only
-allowed on the GUI thread. This migration process made the usage of Spin 
-obsolete, as it does not work with JavaFX.
+frameworks restrict programmatic interactions with GUI components to be only
+allowed on the GUI thread -- sometimes also called event dispatch thread (EDT). 
+This migration process made the usage of Spin obsolete, as it does not work with 
+JavaFX.
 
 The solution to this problem was to adapt the approach of JabRef, that was 
 already employed in parts of the application. JabRef uses an callback based
