@@ -533,10 +533,8 @@ only one module to export the package.
 Another solution could be to rename the packages contained in each artifact,
 this however would break backwards-compatibility of the SDK.
 
-[@tbl:lo-split] shows the development on the bug 
-report^[[https://bugs.documentfoundation.org//show_bug.cgi?id=117331](https://bugs.documentfoundation.org//show_bug.cgi?id=117331)] created for 
-the split package in the bug tracker of the Document Foundation, the maintainer 
-of LibreOffice.
+The issue was reported to the Document Foundation, the maintainer of LibreOffice^[[https://bugs.documentfoundation.org//show_bug.cgi?id=117331](https://bugs.documentfoundation.org//show_bug.cgi?id=117331)].
+[@tbl:lo-split] shows the development on the bug report.
 
 | Date          | Action                                                       |
 | ------------- | ------------------------------------------------------------ |
@@ -545,11 +543,11 @@ of LibreOffice.
 
 : Timeline of the bug report of the split package in LibreOffice {#tbl:lo-split}
 
-As the developers of LibreOffice were unresponsive to the bug report, a possible
-workaround to the problem would be to manually repackage the artifacts to a
-single one as proposed above. However, doing this without support of the 
-original developers would complicate the build process of JabRef, because the
-patched artifact would need to be shipped with the source code instead of
+As the developers of LibreOffice were unresponsive to the bug report as of 
+writing, a possible workaround to the problem would be to manually repackage the 
+artifacts to a single one as proposed above. However, doing this without support 
+of the original developers would complicate the build process of JabRef, because 
+the patched artifact would need to be shipped with the source code instead of
 downloading the dependencies from a central Maven repository as it is done for
 other dependencies.
 
@@ -691,7 +689,31 @@ in this case.
 
 # Modularizing JabRef
 
-**To do**
+After JabRef was running with Java 9, the next goal was to modularize the 
+application in order to reinforce the architectural rules as shown in 
+[@sec:jabref], but also to extract useful libraries for other applications. In
+the past there already efforts to extract libraries from JabRef using the build
+tool Gradle's support for modules^[[https://github.com/JabRef/jabref/pull/3704](https://github.com/JabRef/jabref/pull/3704)].
+Using this approach JabRef would not produce one monolithic JAR artifact, but
+several smaller JAR artifacts depending on each other. The problems that JPMS 
+addresses (see [@sec:j9_adv]), however, would not be addressed using this 
+approach. The changes were discarded due to the release of Java 9.
+
+In order modularize the application with JPMS, an approach as shown in 
+[@fig:approach_mod] was applied iteratively.
+
+![Approach of Modularizing an Application with JPMS](images/approach_mod.svg){#fig:approach_mod}
+
+First a component was chosen and an empty module was created for it. Then the
+dependencies were added according to the planned architecture. Then the packages
+where the component resides in was moved to the new module. In order to find
+missing dependencies, the new module was repeatedly compiled. By analyzing the
+compiler errors, missing dependencies could be found. Dependencies on external
+libraries could easily be added to the build script and the module descriptor.
+Internal conflicts required appropriate refactoring according to the problems
+at hand. Once the new module compiles without errors, the packages that should
+be exported could be declared. Lastly, the application with the extracted module
+was ran to ensure the functionality of the application.
 
 # Conclusion
 
