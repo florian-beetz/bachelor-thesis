@@ -1,12 +1,50 @@
 # Introduction
 
-> Everything changes and nothing stands still.
-> 
-> -- *Heraclitus*
+In average 36% of development time of software systems is used on repaying 
+technical debt -- suboptimal decisions hindering software evolution and 
+maintenance [@Besker2017].
+This is especially problematic for open source projects or software platforms, 
+where compatibility with previous versions is usually highly valued to not
+frighten off users with the effort required to adapt to new versions of the 
+system [@Brito2018].
+However, suboptimal decisions often become clear only later in the lifecycle of 
+a software system and in order to simplify future development require to break
+backwards compatibility.
 
-**To do**
+Recently, such a decision to break backwards compatibility in order to stay 
+relevant was made by the developers of the Java language environment. 
+With the release of Java 9 the fundamental way how code artifacts are organized 
+changed with the introduction of a module system.
+Although several ways of migrating stepwise to the new system and utilizing the
+new features only partly, the new version of the language presents developers
+wanting to migrate to the new in
+the large ecosystem of Java libraries and applications with problems.
 
-# Background
+While the topic of software maintenance and especially software migration is 
+well studied [@Besker2017; @Chapin2001; @Malton2001; @Mancl2001; @Mayrhauser1995]
+and also the migration of applications to different programming languages is
+covered [@Martin2002], not much literature exists on the topic of migrating 
+applications to newer versions of the same language.
+There are also several studies on the topic of +API stability [@Brito2018; @Dig2006],
+which is a big factor for backwards compatibility.
+Migration to Java 9 is mainly described in online documentation [@Oracle2017],
+text books [@Inden2018; @Kothagal2017; @Mac2017] and online experience
+reports [@Parlog2017].
+
+The goal of this thesis is to assess the difficulties that developers encounter
+when migrating applications from Java 8 to Java 9.
+To achieve this, the migration was performed exemplarily on the open source
+bibliography manager JabRef.
+In [@sec:background], first the topic of software migration in general is 
+examined, then the advantages of and the way Java implements modules are 
+analyzed, and the software JabRef is presented.
+[@sec:approach] describes the iterative approach of the migration process 
+applied to JabRef and the encountered problems.
+Then the software was also divided into several smaller modules, which is
+explained in [@sec:modularization].
+Finally, the thesis concludes in [@sec:conclusion].
+
+# Background {#sec:background}
 
 ## Software Migration {#sec:migration}
 
@@ -28,23 +66,22 @@ Software migration tasks can be grouped into three general classes:
   compatible, even when new features were added, in large code bases, however,
   additional effort is required to use new versions of compilers.
 
-* **API migration** is the process of changing a dependency on an external
-  application programming interface (API) to another one or a different version
-  [@Malton2001].
+* **+API migration** is the process of changing a dependency on an external
+  +API to another one or a different version [@Malton2001].
 
-  Similar to other software, libraries that provide an API evolve over time, to
+  Similar to other software, libraries that provide an +API evolve over time, to
   introduce new features, fix bugs, and refactor source code [@Xavier2017].
-  APIs establish a contract with the clients, that rely on them, hence APIs
+  ++API establish a contract with the clients, that rely on them, hence ++API
   should have a high stability to minimize effort for clients when updating to
   a newer version.
-  However, not all changes in APIs are breaking the previously established
+  However, not all changes in ++API are breaking the previously established
   contract, changes that do are referred to as *breaking changes*.
 
-  Breaking changes mainly are modification or removal of existing API
-  elements [@Brito2018]. Adding new API elements are rarely braking changes.
+  Breaking changes mainly are modification or removal of existing +API
+  elements [@Brito2018]. Adding new +API elements are rarely braking changes.
 
   Usually libraries also contain code that is intended only for implementing the
-  services offered by an API, but not for public consumption [@Dig2006].
+  services offered by an +API, but not for public consumption [@Dig2006].
   Many languages do not provide features to explicitly mark such elements as
   internal, but library authors rely solely on naming conventions, e.g. placing
   code in an `internal` namespace. 
@@ -90,26 +127,26 @@ cases, or when new keywords were introduced in the language, such as `strictfp`
 in Java 2, `assert` in Java 4 and `enum` in Java 5, which subsequently can no
 longer be used as identifiers.
 
-With Java 9 the *Java Platform Module System* (JPMS) -- also popular under its
+With Java 9 the *Java Platform Module System* (+JPMS) -- also popular under its
 working name *Jigsaw* -- was introduced the the Java platform among other minor
 changes. 
-JPMS adds *modules*, which are identifiable artifacts containing code, to the 
++JPMS adds *modules*, which are identifiable artifacts containing code, to the 
 Java language [@Mac2017].
-The monolithic JDK itself was also split into smaller modules [@Clark2017].
+The monolithic +JDK itself was also split into smaller modules [@Clark2017].
 
 Since Java 9 the release cycle has also adapted to a faster pace [@Reinhold2018].
 Beginning with Java 9, a feature release will be published every six months and
-long term support (LTS) releases will be released every three years. Because of 
+long term support (+LTS) releases will be released every three years. Because of 
 this, Java 9 is already superseded by Java 10 as of writing, and Java 11, the 
-next LTS release, is expected to be released in September 2018.
+next +LTS release, is expected to be released in September 2018.
 
 ### Advantages of Modules {#sec:j9_adv}
 
-Before Java 9, artifacts were usually distributed as *Java archives* (JARs)
+Before Java 9, artifacts were usually distributed as *Java archives* (++JAR)
 [@Kothagal2017]. Java has a concept of a classpath, which is a path in the
 file system Java searches for compiled code required at runtime or compilation.
 [@fig:classpath] shows a schematic image of a classpath as it would be specified
-to Java. This classpath has 4 JAR files on it, each containing several packages.
+to Java. This classpath has 4 +JAR files on it, each containing several packages.
 The white rectangles symbolize classes in the packages.
 
 ![Unresolved Classpath before Java 9 [@Kothagal2017]](images/classpath.svg){#fig:classpath}
@@ -117,7 +154,7 @@ The white rectangles symbolize classes in the packages.
 Before Java 9, the information of how packages and classes are organized was
 ignored by Java [@Kothagal2017]. Java resolves classes on demand when they are
 first required. [@fig:classpath_resolved] shows the information that is 
-available to Java. All contents of the JARs on the classpath are seen as if it
+available to Java. All contents of the ++JAR on the classpath are seen as if it
 were only one artifact.
 
 ![Resolved Classpath before Java 9 [@Kothagal2017]](images/classpath_resolved.svg){#fig:classpath_resolved}
@@ -133,7 +170,7 @@ This becomes even more problematic with the second problem: If more than one
 type exists with the same fully qualified name, i.e. the package name and the 
 type name is the same, the first one found is used [@Kothagal2017]. This problem 
 most often occurs when different versions of the same libraries are put on the 
-classpath and is referred to as *JAR hell*. As classes are loaded lazily this
+classpath and is referred to as *+JAR hell*. As classes are loaded lazily this
 problems might not even be noticed on startup of an application, but only when
 it was running for some time and a class is used for the first time. Thus
 reliable configuration of the classpath is difficult and explains the rise of
@@ -149,13 +186,13 @@ Access modifier | Class    | Package  | Subclass | Unrestricted
 
 : Access modifiers and their associated scopes [@Mac2017] {#tbl:access}
 
-JPMS aims at exactly these needs of large Java applications: reliable 
++JPMS aims at exactly these needs of large Java applications: reliable 
 configuration and strong encapsulation [@Clark2017].
 
 Modules have to explicitly declare which packages they make available to other
 modules and which modules they are dependent on [@Mac2017].
 Packages that are not exported by a module can not be used in other modules.
-This clearly separates public API from code that is intended for internal use 
+This clearly separates public +API from code that is intended for internal use 
 only. Consequently internal code can also change freely without worrying about 
 introducing breaking changes.
 
@@ -180,7 +217,7 @@ parts that are required to run the respective application.
 
 ### Implementation of Modules {#sec:j9_impl}
 
-To make use of JPMS in Java 9 a module has to declare its public packages and
+To make use of +JPMS in Java 9 a module has to declare its public packages and
 its dependencies as mentioned in [@sec:j9_adv]. This is done using a module
 descriptor, a file called `module-info.java` in the root package, that will be
 compiled as classes to a file called `module-info.class` [@Mac2017]. 
@@ -229,15 +266,15 @@ service `com.company.module.api.Service` with the class
 `com.company.module.api.impl.ServiceImpl` for usage by other modules. This
 declaration of services was already a feature of Java before version 9, but
 relied on a configuration using text files. The declaration of provided and used
-services is JPMS' form of dependency injection, also known as the principle
-*Inversion of Control* (IoC) that allows hiding of implementation details 
+services is +JPMS form of dependency injection, also known as the principle
+*Inversion of Control* (+IoC) that allows hiding of implementation details 
 [@Mac2017].
 
 As an alternative to the explicit declaration of a module descriptor, Java 9
 also allows the usage of so called *automatic modules* [@Mac2017]. Automatic
 Modules do not have a module descriptor, their name is derived from the 
-attribute `Automatic-Module-Name` in the JAR manifest `META-INF/MANIFEST.MF` or
-from the name of the JAR file if that attribute is not present.
+attribute `Automatic-Module-Name` in the +JAR manifest `META-INF/MANIFEST.MF` or
+from the name of the +JAR file if that attribute is not present.
 An automatic module has some special characteristics: It `requires transitive`
 all other resolved modules, exports all its packages and reads the classpath.
 This version of module declaration is favorable if the module has to maintain
@@ -253,14 +290,14 @@ modules can access code in the unnamed module, while explicit modules cannot.
 
 ### Migrating to Modular Code {#sec:j9_mig}
 
-Oracle claims, that code that uses only official Java APIs should work without
+Oracle claims, that code that uses only official Java ++API should work without
 changes, but some third-party libraries may need to be upgraded [@Oracle2018g].
 However, in reality there are some more constraints of the module system that 
 need consideration.
 
-Firstly, due to the modularization of the JDK itself, internal APIs became
+Firstly, due to the modularization of the +JDK itself, internal ++API became
 unavailable [@Mac2017]. Those classes were always meant to be used only 
-internally by the JDK, but due to the missing access restrictions and missing
+internally by the +JDK, but due to the missing access restrictions and missing
 alternatives, they have become adopted by some developers.
 
 For widely used internal classes the module `jdk.unsupported` is provided,
@@ -268,9 +305,9 @@ so that backwards compatibility for applications depending on them is ensured,
 however it is planned that those classes are replaced with supported 
 alternatives in a future Java version [@Mac2017].
 
-While Java 9 still provides the possibility to explicitly make the internal APIs
+While Java 9 still provides the possibility to explicitly make the internal ++API
 available with command line switches like `--add-exports`, the only long-term
-solution is to move away from those APIs and find supported replacement 
+solution is to move away from those ++API and find supported replacement 
 solutions [@Inden2018]. Corresponding to that, the switch `--add-opens` exists
 for allowing reflection into packages of modules, that do not explicitly open
 packages.
@@ -318,9 +355,9 @@ the figure. The base of the architecture is the *Model* component, that
 encapsulates the entities used in the application. Building on top of that 
 component is the *Logic* component, that contains all business logic. The 
 *Preferences* component provides the functionality to load and store user 
-defined settings. JabRef's command line interface is encapsulated in the *CLI* 
+defined settings. JabRef's command line interface is encapsulated in the *+CLI* 
 component and the top layer is constituted by the graphical user interface in 
-the *GUI* component. Additionally, there exist some additional global classes, 
+the *+GUI* component. Additionally, there exist some additional global classes, 
 that may be used anywhere in the application.
 
 ![High-Level Architecture of JabRef](images/jabref_architecture.svg){#fig:architecture}
@@ -335,7 +372,7 @@ repeated tasks such as compilation of the source code, building release
 distributions, resolving correct versions of dependencies, running tests and 
 generation of source code with parser generators.
 
-# Migrating JabRef to Java 9
+# Migrating JabRef to Java 9 {#sec:approach}
 
 The following section covers the process of migrating JabRef from Java 8 to 
 Java 9. 
@@ -354,9 +391,9 @@ respective libraries or a code contribution to their projects was created.
 
 ![General Approach of the Migration](images/approach.svg){#fig:approach}
 
-Issues in JabRef internal code can be classified into access to now internal API
+Issues in JabRef internal code can be classified into access to now internal +API
 and changes in the Java compiler. The only sustainable solution to those 
-problems is migrating away from the API and finding a supported replacement.
+problems is migrating away from the +API and finding a supported replacement.
 Changes in the compiler are usually only minor, but require adaption of the 
 code.
 
@@ -373,19 +410,19 @@ categories.
 
 First, four libraries exported the same packages, resulting in a split package
 as explained in [@sec:j9_mig]. These libraries were the popular utility library
-*Google Guava*, the SDK of the office suite *LibreOffice*, Microsoft's 
+*Google Guava*, the +SDK of the office suite *LibreOffice*, Microsoft's 
 monitoring service *ApplicationInsights* and *ArchUnit*, a test framework to
 check for architecture constraints.
 
 While Google Guava did not actually contain a split package, it had a 
 dependency on an unofficial implementation of Java annotations as specified by
-the Java Specification Request (JSR) 305, that aims at assisting tools to find
+the Java Specification Request (+JSR) 305, that aims at assisting tools to find
 software defects by providing annotations such as `@NonNull` [@Pugh2006]. 
 However, this dependency was optional and thus not required at runtime, so the 
 solution was to explicitly exclude it in the Gradle build script as shown in
 [@lst:jsr-exclusion]. 
 
-```{#lst:jsr-exclusion .java caption="Exclusion of the JSR 305 dependency"}
+```{#lst:jsr-exclusion .java caption="Exclusion of the +JSR 305 dependency"}
 configurations {
     // [...]
 
@@ -397,12 +434,12 @@ configurations {
 
 For ArchUnit a development version was already available, so it could simply be
 updated.
-The LibreOffice SDK and Microsoft ApplicationInsights were incompatible with
+The LibreOffice +SDK and Microsoft ApplicationInsights were incompatible with
 Java 9, so for the first iteration, they were temporarily removed and the 
 features of JabRef depending on them disabled.
 
-Second, the GUI libraries *Spin* and *ControlsFX* and JabRef itself used internal
-APIs in the JDK, that were no longer accessible. For the first iteration, the
+Second, the +GUI libraries *Spin* and *ControlsFX* and JabRef itself used internal
+++API in the +JDK, that were no longer accessible. For the first iteration, the
 solution was to simply use the flags mentioned in [@sec:j9_mig] to allow the
 access to those libraries.
 [@lst:jr-args] shows the command line arguments required to run JabRef in the 
@@ -422,8 +459,8 @@ java \
 The third problem for compile-time compatibility were the module names of some
 dependencies. As mentioned in [@sec:j9_mig] Java first searches for a module
 descriptor, if it can not be found the `Automatic-Module-Name` attribute in the
-JAR manifest is consulted and if that is not present, Java derives a module name
-from the file name of the JAR file.
++JAR manifest is consulted and if that is not present, Java derives a module name
+from the file name of the +JAR file.
 However, module names underlie the same restrictions as Java packages, so they
 may contain dots, but each segment between two dots must be a valid Java 
 identifier.
@@ -517,21 +554,21 @@ objective.
 
 ### LibreOffice
 
-JabRef uses the LibreOffice SDK to insert citations and references into 
+JabRef uses the LibreOffice +SDK to insert citations and references into 
 LibreOffice documents.
-However, the SDK consists of multiple artifacts all exporting the same package
-`com.sun.star`, so they are incompatible with JPMS due to a split package
+However, the +SDK consists of multiple artifacts all exporting the same package
+`com.sun.star`, so they are incompatible with +JPMS due to a split package
 (see [@sec:jr_mig]). 
-Thus the complete SDK and JabRef's functionality to interface with LibreOffice
+Thus the complete +SDK and JabRef's functionality to interface with LibreOffice
 was temporarily removed.
 
 Possible long-term solutions include bundling all artifacts as one artifact, so
-the LibreOffice SDK is no longer modular, but requires consumers to load all of
+the LibreOffice +SDK is no longer modular, but requires consumers to load all of
 it. 
-The problem of the split package however would be solved, as the SDK is then
+The problem of the split package however would be solved, as the +SDK is then
 only one module to export the package.
 Another solution could be to rename the packages contained in each artifact,
-this however would break backwards-compatibility of the SDK.
+this however would break backwards-compatibility of the +SDK.
 
 The issue was reported to the Document Foundation, the maintainer of LibreOffice^[[https://bugs.documentfoundation.org//show_bug.cgi?id=117331](https://bugs.documentfoundation.org//show_bug.cgi?id=117331)].
 [@tbl:lo-split] shows the development on the bug report.
@@ -559,7 +596,7 @@ As briefly shown in [@sec:jr_mig] Scala's default naming scheme generates
 invalid automatic module names, so latex2unicode had to be temporarily removed
 in iteration one.
 
-Since Scala does not yet support JPMS, the solution of this problem is to
+Since Scala does not yet support +JPMS, the solution of this problem is to
 explicitly provide an `Automatic-Module-Name` attribute in the libraries
 manifest (see [@sec:j9_impl]).
 This was proposed to the library maintainer of 
@@ -592,7 +629,7 @@ configuration.
 
 ### Microsoft ApplicationInsights
 
-ApplicationInsights follows the practice to distribute so called fat JARs --
+ApplicationInsights follows the practice to distribute so called fat ++JAR --
 Java artifacts including all required dependencies -- but additionally relocate
 the packages of dependencies under their own package prefix.
 So their dependency on Google Guava using the package `com.google.common` is
@@ -616,10 +653,10 @@ The problem was reported to the library maintainers of ApplicationInsights^[[htt
 
 ### JavaFxSVG
 
-JavaFxSVG is a library that allows the GUI framework JavaFX to display SVG
+JavaFxSVG is a library that allows the +GUI framework JavaFX to display SVG
 graphics.
-The library exports the package `org.w3c.dom` which conflicts with APIs provided
-directly from the JDK.
+The library exports the package `org.w3c.dom` which conflicts with ++API provided
+directly from the +JDK.
 However, this functionality was used at only one occasion -- to display the 
 JabRef logo in an About dialog -- so in agreement with the JabRef developers the 
 library was removed and replaced with JavaFX's native capabilities.
@@ -650,21 +687,21 @@ was to overlay the paths in order to recreate the complete image (see [@lst:logo
 
 The third iteration of migrating JabRef to Java 9 consisted in reworking parts
 of its threading model. The rework was required because JabRef used the library
-"Spin" to simplify interaction of the GUI with long-running background tasks.
+"Spin" to simplify interaction of the +GUI with long-running background tasks.
 Spin provides utilities to load off time-intensive operations to a separate
-thread, so that the GUI stays responsive to user input.
+thread, so that the +GUI stays responsive to user input.
 
 This is done by creating proxy objects that run their operations on a separate
-thread, but wait until their execution has finished, while keeping the GUI 
+thread, but wait until their execution has finished, while keeping the +GUI 
 thread responsive (see [@fig:spin]).
 
 ![Model of Spin [@Meier2007]](images/spin.svg){#fig:spin}
 
 However, the JabRef developers are in the process of migrating from the Swing
-GUI framework, that Spin was written for, to the newer GUI framework JavaFX.
-This migration process already lead to some threading issues, because often GUI
-frameworks restrict programmatic interactions with GUI components to be only
-allowed on the GUI thread -- sometimes also called event dispatch thread (EDT). 
++GUI framework, that Spin was written for, to the newer +GUI framework JavaFX.
+This migration process already lead to some threading issues, because often +GUI
+frameworks restrict programmatic interactions with +GUI components to be only
+allowed on the +GUI thread -- sometimes also called event dispatch thread (+EDT). 
 This migration process made the usage of Spin obsolete, as it does not work with 
 JavaFX.
 
@@ -672,7 +709,7 @@ The solution to this problem was to adapt the approach of JabRef, that was
 already employed in parts of the application. JabRef uses an callback based
 approach partly provided by the JavaFX framework itself.
 This approach provides a class `BackgroundTask` that wraps time consuming 
-operations and provides means to specify callbacks that are executed on the GUI
+operations and provides means to specify callbacks that are executed on the +GUI
 thread once the operations succeeds, fails or either of the two.
 
 ```{#lst:background_task .java caption="Usage of background tasks"}
@@ -684,25 +721,25 @@ BackgroundTask.wrap(this::verifyDuplicates)
 [@lst:background_task] shows how background tasks are used in JabRef. The
 method `verifyDuplicates` is executed on a thread of the `Globals.TASK_EXECUTOR`
 executor service. When the verification of duplicates succeeds the method
-`handleDuplicates` is called on the JavaFX GUI thread, failures are not handled
+`handleDuplicates` is called on the JavaFX +GUI thread, failures are not handled
 in this case.
 
-# Modularizing JabRef
+# Modularizing JabRef {#sec:modularization}
 
 After JabRef was running with Java 9, the next goal was to modularize the 
 application in order to reinforce the architectural rules as shown in 
 [@sec:jabref], but also to extract useful libraries for other applications. In
 the past there already efforts to extract libraries from JabRef using the build
 tool Gradle's support for modules^[[https://github.com/JabRef/jabref/pull/3704](https://github.com/JabRef/jabref/pull/3704)].
-Using this approach JabRef would not produce one monolithic JAR artifact, but
-several smaller JAR artifacts depending on each other. The problems that JPMS 
+Using this approach JabRef would not produce one monolithic +JAR artifact, but
+several smaller +JAR artifacts depending on each other. The problems that +JPMS 
 addresses (see [@sec:j9_adv]), however, would not be addressed using this 
 approach. The changes were discarded due to the release of Java 9.
 
-In order modularize the application with JPMS, an approach as shown in 
+In order modularize the application with +JPMS, an approach as shown in 
 [@fig:approach_mod] was applied iteratively.
 
-![Approach of Modularizing an Application with JPMS](images/approach_mod.svg){#fig:approach_mod}
+![Approach of Modularizing an Application with +JPMS](images/approach_mod.svg){#fig:approach_mod}
 
 First a component was chosen and an empty module was created for it. Then the
 dependencies were added according to the planned architecture. Then the packages
@@ -715,7 +752,7 @@ at hand. Once the new module compiles without errors, the packages that should
 be exported could be declared. Lastly, the application with the extracted module
 was ran to ensure the functionality of the application.
 
-# Conclusion
+# Conclusion {#sec:conclusion}
 
 **To do**
 

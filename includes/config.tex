@@ -8,6 +8,7 @@
 %
 % Hier zunächst die benötigten Packages
 \usepackage[utf8]{inputenc}
+\usepackage[titles]{tocloft}
 \usepackage{fancyhdr}
 \usepackage[T1]{fontenc}
 %\usepackage{ae}
@@ -35,6 +36,12 @@
 } {
     \endorigfigure
 }
+
+\let\oldsection\section
+\renewcommand\section{\clearpage\oldsection}
+
+% list of custom listings
+\newlistof{listing}{lol}{List of Listings}
 
 % use upquote if available, for straight quotes in verbatim environments
 \IfFileExists{upquote.sty}{\usepackage{upquote}}{}

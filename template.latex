@@ -1,0 +1,48 @@
+% Configuration
+\input{includes/config.tex}
+\input{includes/pandoc.tex}
+
+$for(header-includes)$
+$header-includes$
+$endfor$
+
+\addbibresource{$bibliography$}
+%
+\begin{document}
+%
+% Titlepage
+\maketitle{$title$}{$degree$}{$subtitle$}{$author$}{$date$}
+%
+% TOCs
+\pagenumbering{Roman}
+\tableofcontents
+\newpage
+\listoffigures
+\newpage
+\listoftables
+\newpage
+\listoflistings
+\newpage
+\fancyhead[LO]{\footnotesize\sc\nouppercase{Abbreviations}}
+\input{abbreviations/abbreviations.tex}
+\newpage
+\fancyhead[LO]{\footnotesize\sc\nouppercase{\leftmark}}
+\setcounter{page}{1}
+\pagenumbering{arabic}
+%
+% Insert your chapters here
+%
+$body$
+\newpage
+
+%\addcontentsline{toc}{chapter}{Appendix}
+
+\printbibliography[heading=bibintoc]
+\newpage
+
+%
+% Eigenständigkeitserklärung APO
+\makedeclaration{Bachelorarbeit}{\today}{$author$}
+%
+
+\end{document}

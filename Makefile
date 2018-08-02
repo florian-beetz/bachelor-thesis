@@ -1,25 +1,15 @@
 NAME = thesis
 
 FILES = $(NAME).yml $(NAME).md
-TEMPLATE = template
-FILTERS = -F "filters/pandoc-svg.py" -F pandoc-crossref -F pandoc-citeproc
+FILTERS = -F "filters/abbrevs.py" -F "filters/pandoc-svg.py" -F pandoc-crossref -F pandoc-citeproc
 
 all: $(NAME).pdf
 
 $(NAME).pdf: $(NAME).tex
 	latexmk -interaction=nonstopmode -pdf $(NAME).tex
 
-$(NAME).html: $(FILES) $(TEMPLATE).html5
-	pandoc -o $@ --self-contained --highlight-style tango --template $(TEMPLATE).html5 --csl=lncs.csl $(FILTERS) $(FILES)
-
-$(NAME).tex: $(FILES) $(TEMPLATE).tex
-	pandoc -o $@ --biblatex --template $(TEMPLATE).tex $(FILTERS) $(FILES)
-
-$(NAME)-eis.tex: $(FILES) eisvogel.latex
-	pandoc -o $@ --biblatex --template eisvogel.latex $(FILTERS) eisvogel.yml $(FILES)
-
-$(NAME)-eis.pdf: $(NAME)-eis.tex
-	latexmk -interaction=nonstopmode -pdf $(NAME)-eis.tex
+$(NAME).tex: $(FILES)
+	pandoc -o $@ --biblatex --template template.latex $(FILTERS) $(FILES)
 
 graphics:
 	@for svg in `find images/*.svg`;	\
@@ -30,7 +20,5 @@ graphics:
 
 clean:
 	rm -f *.pdf 
-	rm -f *.html
 	latexmk -c *.tex
 	rm -f $(NAME).tex
-	rm -f $(NAME)-eis.tex
