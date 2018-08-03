@@ -170,7 +170,7 @@ This becomes even more problematic with the second problem: If more than one
 type exists with the same fully qualified name, i.e. the package name and the 
 type name is the same, the first one found is used [@Kothagal2017]. This problem 
 most often occurs when different versions of the same libraries are put on the 
-classpath and is referred to as *+JAR hell*. As classes are loaded lazily this
+classpath and is referred to as *+JAR hell*. As classes are loaded lazily, those
 problems might not even be noticed on startup of an application, but only when
 it was running for some time and a class is used for the first time. Thus
 reliable configuration of the classpath is difficult and explains the rise of
@@ -215,7 +215,54 @@ Java 9 is better equipped to be run on devices for the Internet of Things (IoT)
 now do no longer have to store the full runtime environments, but only those 
 parts that are required to run the respective application.
 
-### Implementation of Modules {#sec:j9_impl}
+### Modular Code before Java 9 {#sec:j9_before}
+
+Although modular code was not available to the Java at the language level, there
+are tools and libraries that provide similar functionality.
+
+Many projects use a build tool to automate building source code, the most widely
+used ones in the Java ecosystem being +ANT (Another Neat Tool), Apache Maven and 
+Gradle [@Muschko2014].
+The main goals of build tools are removing manual interaction, creating
+repeatable builds and making builds repeatable.
+Build tools let users express the tasks that need to be executed in order to
+build an artifact in an build file.
+Those tasks are ordered and thus are internally represented as a directed 
+acyclic graph (+DAG), to model dependencies on other tasks [@McIntosh2012].
+
+A key feature of build tools is the declaration of dependencies a project
+requires [@Muschko2014]. [@fig:maven] shows how the build tool Maven resolves
+dependencies: It first interprets the build script -- in the case of Maven a
+Project Object Model (+POM) file -- checks the local cache if the dependency is
+already available on the local machine, and else downloads the required 
+artifacts from a central Maven repository.
+Gradle implements similar dependency management functionality.
+
+![Maven's Interaction with Maven Central to resolve and download dependencies for a build [@Muschko2014]](images/maven.svg){#fig:maven}
+
+Since dependencies in the central Maven repository must also declare their
+dependencies, the dependencies of dependencies -- so called 
+*transitive dependencies* -- can also be automatically be resolved [@Muschko2014].
+
+Dependency management of Maven and Gradle is not limited to external libraries,
+but also supports decomposition of software into modules.
+While these modules can theoretically be accessed from every other module at
+runtime as described in [@sec:j9_adv], only the declared dependencies are put
+on the classpath on compile-time.
+
+The explicit declaration of dependencies, the ability to create a dependency
+graph by resolving external libraries and their transitive dependencies, and
+the possibility to define modules gives build tools similar functionality to
++JPMS.
+However, in contrast to +JPMS build tools do not alter any behavior at runtime.
+While build tools handle the configuration of the classpath at compile-time,
+misconfiguration may still happen at runtime.
+Build tools -- especially the resolving of dependencies -- can be used in
+parallel with +JPMS.
+
+**To do: OSGi**
+
+### JPMS' Modules {#sec:j9_impl}
 
 To make use of +JPMS in Java 9 a module has to declare its public packages and
 its dependencies as mentioned in [@sec:j9_adv]. This is done using a module
