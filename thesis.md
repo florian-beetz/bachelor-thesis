@@ -16,9 +16,9 @@ relevant was made by the developers of the Java language environment.
 With the release of Java 9 the fundamental way how code artifacts are organized 
 changed with the introduction of a module system.
 Although several ways of migrating stepwise to the new system and utilizing the
-new features only partly, the new version of the language presents developers
-wanting to migrate to the new in
-the large ecosystem of Java libraries and applications with problems.
+new features only partly, the new version of the language presents developers of
+the large ecosystem of Java libraries and applications wanting to migrate with 
+problems.
 
 While the topic of software maintenance and especially software migration is 
 well studied [@Besker2017; @Chapin2001; @Malton2001; @Mancl2001; @Mayrhauser1995]
@@ -120,7 +120,7 @@ The first version of Java was then released in 1996.
 In 2009 Oracle acquired Sun and since then is the maintainer of the language
 [@Oracle2015].
 
-Since then, Java has a very good history of being backwards compatible with previous 
+Since its origin, Java has a very good history of being backwards compatible with previous 
 releases [@Marx2016; @Oracle2018d; @Oracle2018f; @Oracle2018; @Oracle2018a; @Oracle2018b; @Oracle2018c; @Oracle2018e].
 According to Oracle, incompatibilities usually occur only in rarely used edge-
 cases, or when new keywords were introduced in the language, such as `strictfp`
