@@ -265,12 +265,18 @@ OSGi framework [@Reinhold2017a].
 OSGi goes beyond the functionality of +JPMS and provides in addition to a module
 system also a life-cycle management and a service registry.
 
-```{#lst:osgi-manifest .json caption="OSGi Bundle Metadata"}
+**To do: all the OSGi stuff**
+
+```{#lst:osgi-manifest .json caption="OSGi Bundle Metadata [@Hall2011]"}
+Manifest-Version: 1.0
+Created-By: 1.4 (Sun Microsystems Inc.)
 Bundle-ManifestVersion: 2
-Bundle-Name: Greeting API
-Bundle-SymbolicName: org.foo.hello
-Bundle-Version: 1.0
-Export-Package: org.foo.hello;version="1.0"
+Bundle-SymbolicName: org.foo.api
+Bundle-Version: 1.0.0.SNAPSHOT
+Bundle-Name: Simple Paint API
+Export-Package: org.foo.api
+Import-Package: javax.swing,org.foo.api
+Bundle-License: http://www.opensource.org/licenses/apache2.0.php
 ```
 
 ### JPMS' Modules {#sec:j9_impl}
