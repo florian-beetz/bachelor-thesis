@@ -422,7 +422,7 @@ However, this dependency was optional and thus not required at runtime, so the
 solution was to explicitly exclude it in the Gradle build script as shown in
 [@lst:jsr-exclusion]. 
 
-```{#lst:jsr-exclusion .java caption="Exclusion of the +JSR 305 dependency"}
+```{#lst:jsr-exclusion .java caption="Exclusion of the JSR 305 dependency"}
 configurations {
     // [...]
 
@@ -834,7 +834,56 @@ components across both modules.
 
 ## Tool Support for Modularization
 
-**To do**
+Another problem when modularizing JabRef was the lacking support of the used
+tools for modularized Java code.
+As mentioned in [@sec:jabref], JabRef is built using the build tool Gradle.
+While Gradle has an experimental plugin called *experimental-jigsaw* providing 
+support for +JPMS^[[https://github.com/gradle/gradle-java-modules](https://github.com/gradle/gradle-java-modules)],
+this plugin but according to the authors currently is "not very sophisticated or 
+particularly well-tested". Also development on this project is stale for over a
+year as of writing.
+
+To build JabRef a derivative of the above plugin called *chainsaw* is used.
+Chainsaw^[[https://github.com/zyxist/chainsaw](https://github.com/zyxist/chainsaw)]
+is an open-source project and has more sophisticated features than 
+experimental-jigsaw, such as supporting popular unit test frameworks, patching
+modules and providing support for the flags `--add-exports` and `--add-opens`
+as described in [@sec:j9_mig].
+However, chainsaw does not support building projects consisting of multiple
+modules. This issue is reported to the maintainer of the project^[[https://github.com/zyxist/chainsaw/issues/34](https://github.com/zyxist/chainsaw/issues/34)],
+but is unresolved as of writing.
+
+This issue can be resolved by applying a workaround as shown in [@lst:cs_workaround].
+With this workaround, the dependencies of the task `compileJava` are explicitly
+set to the `assemble` task, that builds a +JAR file, of the modules `jabref-model`
+and `jabref-logic`. 
+
+```{#lst:cs_workaround .java caption="Workaround for Multi-Module Builds using Chainsaw"}
+compileJava.dependsOn ":jabref-model:assemble"
+compileJava.dependsOn ":jabref-logic:assemble"
+```
+
+Another problem in the tool support for +JPMS is Gradle itself. Gradle supports
+running automated unit tests which is executed by default on every build.
+However, there is an unfixed bug in Gradle^[[https://github.com/gradle/gradle/issues/4974](https://github.com/gradle/gradle/issues/4974)]
+that causes errors when the wide adopted logging library *+SLF4J* (Simple Logging
+Facade for Java) is used in the tests with Java 9.
+
+```{#lst:gradle_error .xml caption="Gradle causes Errors when SLF4J is used"}
+SLF4J: No SLF4J providers were found.
+SLF4J: Defaulting to no-operation (NOP) logger implementation
+SLF4J: See http://www.slf4j.org/codes.html#noProviders for further 
+details.
+java.lang.ClassCastException: org.slf4j/org.slf4j.helpers.NOPLoggerFactory 
+cannot be cast to org.gradle.internal.logging.slf4j.
+OutputEventListenerBackedLoggerContext
+```
+
+This is a major impediment for many libraries using Gradle when wanting to
+migrate to Java 9. 
+Many libraries rely on running unit tests and over 28.000 artifacts on the Maven 
+Central repository^[[https://mvnrepository.com/artifact/org.slf4j/slf4j-api](https://mvnrepository.com/artifact/org.slf4j/slf4j-api)] 
+use SLF4J.
 
 # Conclusion {#sec:conclusion}
 
