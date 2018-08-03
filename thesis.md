@@ -752,6 +752,20 @@ at hand. Once the new module compiles without errors, the packages that should
 be exported could be declared. Lastly, the application with the extracted module
 was ran to ensure the functionality of the application.
 
+The modularization was performed with a bottom-up approach. First the components
+with no dependencies on other components were extracted, then the components
+with only dependencies on already modularized components were extracted and so
+forth. This was done to avoid circular dependencies, which are disallowed by 
++JPMS [@Mac2017].
+
+## Extracting the Model Module
+
+The first step of performing the modularization of JabRef was to extract the
+model component, as it has no dependencies on other components, but almost all
+components depend on it.
+
+**To do**
+
 # Conclusion {#sec:conclusion}
 
 **To do**
