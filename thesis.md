@@ -260,7 +260,18 @@ misconfiguration may still happen at runtime.
 Build tools -- especially the resolving of dependencies -- can be used in
 parallel with +JPMS.
 
-**To do: OSGi**
+Another way of achieving modularity in Java before Java 9 is provided by the
+OSGi framework [@Reinhold2017a]. 
+OSGi goes beyond the functionality of +JPMS and provides in addition to a module
+system also a life-cycle management and a service registry.
+
+```{#lst:osgi-manifest .json caption="OSGi Bundle Metadata"}
+Bundle-ManifestVersion: 2
+Bundle-Name: Greeting API
+Bundle-SymbolicName: org.foo.hello
+Bundle-Version: 1.0
+Export-Package: org.foo.hello;version="1.0"
+```
 
 ### JPMS' Modules {#sec:j9_impl}
 
