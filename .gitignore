@@ -17,6 +17,7 @@ thesis-eis.tex
 *.cb
 *.cb2
 *.xdv
+*.lop
 
 ## Intermediate documents:
 *.dvi

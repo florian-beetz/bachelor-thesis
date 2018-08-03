@@ -758,11 +758,81 @@ with only dependencies on already modularized components were extracted and so
 forth. This was done to avoid circular dependencies, which are disallowed by 
 +JPMS [@Mac2017].
 
-## Extracting the Model Module
+## Handling Illegal Dependencies
 
-The first step of performing the modularization of JabRef was to extract the
-model component, as it has no dependencies on other components, but almost all
-components depend on it.
+The first problem encountered in the modularization were violations of the
+architecture, so parts of a component had dependencies on components, where
+-- according to the architecture -- this dependency should not exist.
+
+![Illegal Dependency of `BackupManager`](images/arch_conflict1.svg){#fig:arch_conflict1}
+
+[@fig:arch_conflict1] shows the dependencies of the class `BackupManager` in the
+package `org.jabref.logic.autosaveandbackup` of the Logic component on classes 
+of the components Model, Logic and Preferences. 
+However, the Logic component only depends on the Model component, thus the
+classes in the Preferences component become unavailable after modularization.
+
+There are multiple scenarios how this conflict could be solved:
+First, the architecture could be simply changed, so that the Logic module 
+depends on the Preferences component. If many instances of the same problem
+exist in the code base, this might be a practical solution. In JabRef's case
+however, this was the only occurrence of this problem, so changing the the
+architecture of the application to make one component available is not the ideal
+solution.
+
+Second, the dependency on the Preferences module could be removed. Depending on
+the type of the dependency this may be a viable solution, for example if 
+alternatives for the used functionalities are available. In this case however,
+removing the dependency would have lead to code duplication, which is 
+unfavorable for enabling good software maintainability.
+
+Third, the components Logic and Preferences could be joined in one module. This
+would weaken the encapsulation of the components, but especially if there
+exist many circular dependencies between the components, this might be the only
+acceptable solution. In JabRef's case there were no circular dependencies 
+between the modules, so the modules were not joined.
+
+Lastly, the parts of the component causing the conflict could be moved up in the
+dependency hierarchy to the next component that depends on all required 
+components. This solution has the downside, that the +API of the affected 
+components become scattered across modules, but depending on the use-case this
+might be acceptable. Another thing to keep in mind, is that Java 9 does no 
+longer allow split packages, so either the whole package needs to be moved, or
+the package needs to be split into two different packages. For JabRef, this 
+solution was pursued since the affected parts of the +API are only a small part
+of the component and the solution was already implemented previously^[[https://github.com/jabref/jabref/tree/multi-module-build/org.jabref.gui/src/main/java/org/jabref/logic/autosaveandbackup](https://github.com/jabref/jabref/tree/multi-module-build/org.jabref.gui/src/main/java/org/jabref/logic/autosaveandbackup)].
+
+A slightly more complex conflict occurred in the class `OpenDatabase` as shown 
+in [@fig:arch_conflict2]. Here, the action responsible for opening literature
+databases also performs several migrations on older database versions. However,
+the migrations located in `org.jabref.migrations` are considered global classes
+in the architecture. Some of the migrations also require user interaction, so
+they depend on the +GUI component, while others do not and only depend on the
+Logic and Model component^[The dependencies on the Model component are not shown
+in [@fig:arch_conflict2].].
+
+![Architecture Conflict in `OpenDatabase`](images/arch_conflict2.svg){#fig:arch_conflict2}
+
+The possibilities to solve this conflict are roughly the same as before, however
+the change of architecture and the removal of the dependency was not favorable
+for the same reasons as before.
+To solve this conflict a combination of joining the components and moving the
+conflicting classes up in the hierarchy was chosen. 
+First the package `org.jabref.migrations` was split into the packages
+`org.jabref.logic.migrations` containing the classes that require no user
+interaction and `org.jabref.gui.migratons` for the classes that do.
+The `logic` part of the migrations was then moved to the Logic component and
+the `gui` part to the +GUI component.
+
+Moving the `OpenDatabase` action up in the dependency hierarchy to the +GUI
+component in this case would have made no sense, as it would have required to
+move large parts of the Logic module along with it. Likewise, moving the whole
+`migrations` package to the Logic module would have required to move large parts
+of the +GUI component along.
+Both would have reduced the encapsulation of the modules and scattered the
+components across both modules.
+
+## Tool Support for Modularization
 
 **To do**
 
