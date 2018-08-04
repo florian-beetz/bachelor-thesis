@@ -983,7 +983,54 @@ Many libraries rely on running unit tests and over 28.000 artifacts on the Maven
 Central repository^[[https://mvnrepository.com/artifact/org.slf4j/slf4j-api](https://mvnrepository.com/artifact/org.slf4j/slf4j-api)] 
 use SLF4J.
 
-**To Do: IDEs, Gradle has no BOM**
+Additionally to this bug, Gradle has another issue, that does not only affect 
+Java 9 or modularization with +JPMS, but especially Gradle's multi-module builds
+in general:
+Gradle has no central place to manage dependencies of multiple modules across
+a build.
+In contrast Maven, has the concept of a *Bill of Materials* (+BOM), that lists
+all dependencies and their versions in the root project.
+Gradle manages dependencies separately in each build script for every module.
+This requires to keep track of modules that are shared between different modules
+and causes additional effort to keep the versions of those dependencies 
+synchronized across every module.
+Different versions of the dependencies would likely cause unexpected behavior
+as described in [@sec:j9_adv].
+
+To work around this problem a custom solution was implemented, that groups
+dependencies into groups and makes them reusable across different modules^[[https://github.com/JabRef/jabref/pull/4163](https://github.com/JabRef/jabref/pull/4163)].
+[@lst:cleanup-bs] shows an excerpt from the centralized dependency management in
+Gradle's `buildSrc` project, that is put on the classpath of every build script.
+In the build scripts the groups of dependencies can then be used as 
+`libraries.libreOffice` without requiring to specify the version locally.
+
+```{#lst:cleanup-bs .java caption="Centralized Dependency Management in Gradle"}
+package org.jabref.build
+class Dependencies {
+    static def libraries = [
+            libreOffice: [
+                    "org.libreoffice:juh:5.4.2",
+                    "org.libreoffice:jurt:5.4.2",
+                    "org.libreoffice:ridl:5.4.2",
+                    "org.libreoffice:unoil:5.4.2",
+            ],
+            // >1.8.0-beta is required for java 9 compatibility
+            loggingApi: "org.slf4j:slf4j-api:1.8.0-beta2",
+
+            // [...]
+    ]
+}
+```
+
+In contrast, a tool used for the modularization of JabRef supporting Java 9 well
+was the +IDE  (Integrated Development Environment) *JetBrains IntelliJ IDEA 
+2018.1 Ultimate*.
+For example, when moving parts of an application to a new module, this +IDE 
+automatically analyzes the required dependencies of the moved parts and warns 
+developers when some dependencies will not be available in the new module.
+
+In summary the missing support of the used tools for Java 9 modules was the 
+biggest problem for modularizing JabRef.
 
 # Future Work
 
