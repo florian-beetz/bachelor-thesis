@@ -42,7 +42,7 @@ analyzed, and the software JabRef is presented.
 applied to JabRef and the encountered problems.
 Then the software was also divided into several smaller modules, which is
 explained in [@sec:modularization].
-Finally, the thesis concludes in [@sec:conclusion].
+Finally, future work will be outlined in [@sec:future] and the thesis concludes in [@sec:conclusion].
 
 # Background {#sec:background}
 
@@ -1032,7 +1032,7 @@ developers when some dependencies will not be available in the new module.
 In summary the missing support of the used tools for Java 9 modules was the 
 biggest problem for modularizing JabRef.
 
-# Future Work
+# Future Work {#sec:future}
 
 In the process of migrating JabRef multiple code contributions were provided
 to various open source projects including JabRef itself.
@@ -1074,6 +1074,36 @@ code base would shrink, and such extensions could be maintained separately.
 
 # Conclusion {#sec:conclusion}
 
-**To do**
+The Java programming language has experienced high popularity in many
+enterprises and also from private developers since its initial release in 1996.
+Since then the Java platform has continuously undergone changes and many
+features were added.
+With the latest major addition -- the Java Platform Module System (+JPMS) --
+many Java developers have to cope with breaking changes in the platform.
+
+In this thesis, the challenges when migrating to +JPMS were analyzed.
+First the open source application JabRef was migrated to Java 9.
+While there were also some problems with the access of internal ++API in the
+Java Development Kit (+JDK), the main problem when upgrading to Java 9 is the
+unavailability of updates for compatible third-party libraries.
+
+Many very popular and widely used libraries such as *Google Guava* are not yet
+fully compatible with Java 9.
+The maintainers of the libraries are often already aware of the
+incompatibilities or are responsive when they are pointed out to them.
+A huge problem, however, is the unresponsiveness of maintainers of legacy
+libraries.
+While solutions for those problems such as manually patching libraries was
+proposed, no completely satisfactory solution could be implemented in this 
+thesis.
+
+The problems caused by the modularization of the +JDK -- internal ++API becoming
+unavailable -- can easily be circumvented by the wide range of utilities
+provided by the maintainers of the Java programming language.
+Solving such problems in the long term, however, require developers to migrate
+to new supported ++API.
+
+In the second part of this thesis, JabRef was decomposed into multiple modules.
+
 
 # References
