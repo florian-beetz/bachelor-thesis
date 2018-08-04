@@ -121,7 +121,7 @@ In 2009 Oracle acquired Sun and since then is the maintainer of the language
 [@Oracle2015].
 
 Since its origin, Java has a very good history of being backwards compatible with previous 
-releases [@Marx2016; @Oracle2018d; @Oracle2018f; @Oracle2018; @Oracle2018a; @Oracle2018b; @Oracle2018c; @Oracle2018e].
+releases [@Marx2016; @Oracle2018d; @Oracle2018f; @Oracle2018c; @Oracle2018a; @Oracle2018b; @Oracle2018; @Oracle2018e].
 According to Oracle, incompatibilities usually occur only in rarely used edge-
 cases, or when new keywords were introduced in the language, such as `strictfp`
 in Java 2, `assert` in Java 4 and `enum` in Java 5, which subsequently can no
@@ -268,7 +268,7 @@ system also a life-cycle management and a service registry.
 The framework implements the module system by using custom classloaders -- the 
 mechanism Java uses to load classes -- and metadata distributed in the manifest
 `META-INF/MANIFEST.MF` file of the module, which are called bundles by OSGi 
-[@Hall].
+[@Hall2011].
 [@lst:osgi-manifest] shows an example manifest of a bundle.
 Similar to +JPMS the bundle declares its name, the packages it exports and the
 packages it will use from other bundles among other metadata.
