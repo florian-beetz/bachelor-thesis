@@ -364,7 +364,7 @@ service `com.company.module.api.Service` with the class
 `com.company.module.api.impl.ServiceImpl` for usage by other modules. This
 declaration of services was already a feature of Java before version 9, but
 relied on a configuration using text files. The declaration of provided and used
-services is +JPMS form of dependency injection, also known as the principle
+services is +JPMS form of dependency injection (+DI), also known as the principle
 *Inversion of Control* (+IoC) that allows hiding of implementation details 
 [@Mac2017].
 
@@ -982,6 +982,48 @@ migrate to Java 9.
 Many libraries rely on running unit tests and over 28.000 artifacts on the Maven 
 Central repository^[[https://mvnrepository.com/artifact/org.slf4j/slf4j-api](https://mvnrepository.com/artifact/org.slf4j/slf4j-api)] 
 use SLF4J.
+
+**To Do: IDEs, Gradle has no BOM**
+
+# Future Work
+
+In the process of migrating JabRef multiple code contributions were provided
+to various open source projects including JabRef itself.
+While a functional version of JabRef could be produced, some parts of the
+application had to be disabled due to some external libraries not providing
+updates, that are compatible with Java 9.
+Due to those issues, the version is not yet released in binary form.
+
+For the future the primary goal should be to get this version released.
+It is unclear, if the maintainers of those libraries will provide an update in
+the future, but the parts disabled in JabRef will have to be reenabled before a
+Java 9 compatible version can be officially released.
+If the maintainers stay unresponsive, libraries providing similar functionality
+and being compatible with Java 9 should be adopted.
+This will require future effort, as it is likely that the ++API of such libraries
+will differ.
+In the case that no alternatives are available, the maintenance of the libraries
+could be taken over, but this would have exceeded the scope of this thesis.
+
+In addition to the compatible version with Java 9, the application was
+modularized with +JPMS.
+The current modularization resembles the basic components of the high-level
+architecture (see [@sec:jabref]).
+
+In a future version the modularization could be done much more fine-grained.
+Especially features of JabRef such as the fetchers, that can fetch bibliography
+entries form various sources, could be implemented using +JPMS services.
+But also features outside of JabRef's core functionality, that are not 
+necessarily required and are not used by every user, such as synchronizing
+bibliography databases with +SQL (Structured Query Language) databases or
+automatically generating bibliographies and citations in third-party
+applications, could be extracted to additional modules.
+The services of those modules could be loaded as available, so that they are
+not required to run JabRef.
+This would change the architecture of JabRef to a more service oriented 
+architecture (+SOA).
+Also this would reduce maintenance effort of JabRef, as the size of the core
+code base would shrink, and such extensions could be maintained separately.
 
 # Conclusion {#sec:conclusion}
 
