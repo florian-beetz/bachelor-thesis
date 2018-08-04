@@ -265,7 +265,13 @@ OSGi framework [@Reinhold2017a].
 OSGi goes beyond the functionality of +JPMS and provides in addition to a module
 system also a life-cycle management and a service registry.
 
-**To do: all the OSGi stuff**
+The framework implements the module system by using custom classloaders -- the 
+mechanism Java uses to load classes -- and metadata distributed in the manifest
+`META-INF/MANIFEST.MF` file of the module, which are called bundles by OSGi 
+[@Hall].
+[@lst:osgi-manifest] shows an example manifest of a bundle.
+Similar to +JPMS the bundle declares its name, the packages it exports and the
+packages it will use from other bundles among other metadata.
 
 ```{#lst:osgi-manifest .json caption="OSGi Bundle Metadata [@Hall2011]"}
 Manifest-Version: 1.0
@@ -278,6 +284,34 @@ Export-Package: org.foo.api
 Import-Package: javax.swing,org.foo.api
 Bundle-License: http://www.opensource.org/licenses/apache2.0.php
 ```
+
+In contrast to +JPMS, OSGi bundles also have a certain life-cycle as shown in
+[@fig:osgi_lifecycle] [@Hall2011].
+Bundles first need to be installed, they then are resolved. They then can be
+started and stopped at runtime. They also can be updated or even uninstalled at
+runtime.
+
+This makes OSGi's module system much more dynamic than +JPMS and explains why
+it is commonly used as a plugin system to allow extending application's 
+functionality [@Hall2011].
+
+![OSGi Bundle Life-Cycle [@Hall2011]](images/osgi_lifecycle.svg){#fig:osgi_lifecycle}
+
+The OSGi framework also provides an approach to implement a service oriented
+architecture (+SOA) [@Hall2011].
+As shown in [@fig:osgi_services], OSGi bundles can provide a description of the
+services they provide in the form of XML files.
+OSGi has a service registry, where the provided services are registered and can
+be looked up by other bundles to use them.
+
+![OSGi Service Registry [@Hall2011]](images/osgi_services.svg){#fig:osgi_services}
+
+In comparison to +JPMS, OSGi provides much more elaborated features.
+However, JSR 376 specifying Java's module system states, that OSGi only can
+address the issue of reliable configuration, but not the issue of strong
+encapsulation as it is itself built on top of the Java platform [@Reinhold2017a].
+Similar to the above mentioned build tools, OSGi can also be used together with 
+Java 9.
 
 ### JPMS' Modules {#sec:j9_impl}
 
