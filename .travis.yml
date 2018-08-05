@@ -5,7 +5,7 @@ before_install:
   sudo dpkg -i pandoc-2.2.1-1-amd64.deb
 - wget https://github.com/lierdakil/pandoc-crossref/releases/download/v0.3.2.0/linux-ghc84-pandoc22.tar.gz &&
   tar -xvzf linux-ghc84-pandoc22.tar.gz && sudo chmod +x pandoc-crossref && sudo mv pandoc-crossref /usr/local/bin
-- sudo pip install pandocfilters
+install: pip install pandocfilters
 before_script:
 - python --version
 - pandoc --version
