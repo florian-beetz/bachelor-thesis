@@ -1,4 +1,5 @@
-#!/usr/bin/env python3git d
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 """
 Replace all abbreviations defined in file 'dbase' (assumed to be in default '.pandoc' direc), and in document metadata.
