@@ -1,7 +1,5 @@
 before_install:
-- sudo apt-get update && sudo apt-get install --no-install-recommends texlive-fonts-recommended
-  texlive-latex-extra texlive-fonts-extra texlive-latex-recommended dvipng 
-  latexmk texlive-bibtex-extra biber lmodern inkscape latex-xcolor
+- sudo apt-get update && sudo apt-get install --no-install-recommends biber
 - wget https://github.com/jgm/pandoc/releases/download/2.2.1/pandoc-2.2.1-1-amd64.deb &&
   sudo dpkg -i pandoc-2.2.1-1-amd64.deb
 - wget https://github.com/lierdakil/pandoc-crossref/releases/download/v0.3.2.0/linux-ghc84-pandoc22.tar.gz &&
@@ -32,3 +30,18 @@ notifications:
   email:
     on_success: never
     on_failure: always
+
+addons:
+  apt:
+    packages:
+      - python3
+      - inkscape
+      - texlive-fonts-extra
+      - texlive-fonts-recommended
+      - texlive-latex-extra
+      - texlive-latex-recommended
+      - texlive-bibtex-extra
+      - lmodern
+      - latexmk
+      - latex-xcolor
+      - dvipng
