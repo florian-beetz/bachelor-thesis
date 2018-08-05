@@ -23,10 +23,10 @@ def abbreplace(key, value, format, meta):
             abbrevlist[str(k.strip('+'))] = stringify(v['c']) # add key and value to the abbrev dictionary
 
     if key == 'Str' and re.match(regex, value):# is the string an abbrev? (starts with a plus/bracket? see line 20)
-        bare = value.strip('.,;:(()[]{}\u2019')# get the bare abbrev string by stripping potential punctutation
-        rp = value.lstrip('.,;: ()[]{}\u2019')# strip punct chars from left
+        bare = value.strip('.,;:(()[]{}’')# get the bare abbrev string by stripping potential punctutation
+        rp = value.lstrip('.,;: ()[]{}’')# strip punct chars from left
         rp2 = rp.lstrip(bare)# strip abbrev from left, leaving only punct chars on right of abbreviations
-        lp = value.rstrip('.,;: ()[]{}\u2019')
+        lp = value.rstrip('.,;: ()[]{}’')
         lp2 = lp.rstrip(bare)# same as previous two lines but on LHS
 
         if bare.startswith('++'):
