@@ -42,7 +42,8 @@ analyzed, and the software JabRef is presented.
 applied to JabRef and the encountered problems.
 Then the software was also divided into several smaller modules, which is
 explained in [@sec:modularization].
-Finally, future work will be outlined in [@sec:future] and the thesis concludes in [@sec:conclusion].
+Finally, future work will be outlined in [@sec:future] and the thesis concludes 
+in [@sec:conclusion].
 
 # Background {#sec:background}
 
@@ -523,7 +524,7 @@ solution was to explicitly exclude it in the Gradle build script as shown in
 ```{#lst:jsr-exclusion .java caption="Exclusion of the JSR 305 dependency"}
 configurations {
     // [...]
-
+point that shoudld
     compile {
         exclude group: 'com.google.code.findbugs', module: 'jsr305'
     }
@@ -930,7 +931,7 @@ of the +GUI component along.
 Both would have reduced the encapsulation of the modules and scattered the
 components across both modules.
 
-## Tool Support for Modularization
+## Tool Support for Modularization {#sec:tools}
 
 Another problem when modularizing JabRef was the lacking support of the used
 tools for modularized Java code.
@@ -1059,7 +1060,7 @@ architecture (see [@sec:jabref]).
 
 In a future version the modularization could be done much more fine-grained.
 Especially features of JabRef such as the fetchers, that can fetch bibliography
-entries form various sources, could be implemented using +JPMS services.
+entries form various sources, could be implemented using +JPMS' services.
 But also features outside of JabRef's core functionality, that are not 
 necessarily required and are not used by every user, such as synchronizing
 bibliography databases with +SQL (Structured Query Language) databases or
@@ -1072,6 +1073,12 @@ architecture (+SOA).
 Also this would reduce maintenance effort of JabRef, as the size of the core
 code base would shrink, and such extensions could be maintained separately.
 
+Another important point that should be addressed in the future is the support
+of build tools for Java 9.
+All of the used tools described in [@sec:tools] are publicly available as open-
+source projects.
+
+
 # Conclusion {#sec:conclusion}
 
 The Java programming language has experienced high popularity in many
@@ -1081,7 +1088,8 @@ features were added.
 With the latest major addition -- the Java Platform Module System (+JPMS) --
 many Java developers have to cope with breaking changes in the platform.
 
-In this thesis, the challenges when migrating to +JPMS were analyzed.
+In the first part of this thesis, the challenges when migrating to +JPMS were 
+analyzed.
 First the open source application JabRef was migrated to Java 9.
 While there were also some problems with the access of internal ++API in the
 Java Development Kit (+JDK), the main problem when upgrading to Java 9 is the
@@ -1104,6 +1112,24 @@ Solving such problems in the long term, however, require developers to migrate
 to new supported ++API.
 
 In the second part of this thesis, JabRef was decomposed into multiple modules.
+The main problem encountered was the lacking support of the used tools.
+Popular and widely used build tools such as *Gradle* still have difficulties
+supporting Java 9 builds after almost a year since its release.
+A well-organized architecture is essential for modularizing an application.
+Cleanly encapsulated components with clear dependencies make modularization
+basically trivial.
 
+Despite all the encountered problems, such a huge change as the introduction of
++JPMS is unknown to previous releases of Java.
+It is questionable, if the accelerated release cycle of Java helped slowing down
+the adoption of Java 9 in popular libraries and tools, as Java 9 is already
+outdated and unsupported since March 2018, or if developers will wait until the
+release of the next +LTS release -- Java 11 -- in September 2018, which will be
+supported until September 2023 [@Reinhold2018].
+
+In conclusion, the introduction of modularization in Java at a language level
+was a necessary and long awaited change.
+It is possible that the developers in the Java ecosystem simply are not used to
+the faster release cycle and will adopt +JPMS in the future.
 
 # References
