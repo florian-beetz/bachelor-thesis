@@ -1,27 +1,48 @@
 # Introduction
 
 In average 36% of development time of software systems is used on repaying 
-technical debt -- suboptimal decisions hindering software evolution and 
-maintenance [@Besker2017].
-This is especially problematic for open source projects or software platforms, 
-where compatibility with previous versions is usually highly valued to not
-frighten off users with the effort required to adapt to new versions of the 
-system [@Brito2018].
-However, suboptimal decisions often become clear only later in the lifecycle of 
-a software system and in order to simplify future development require to break
-backwards compatibility.
+technical debt [@Besker2017].
+Technical debt is a term coined by Ward Cunningham and is used to explain to
+non-technical stakeholders the need for "refactoring", i.e. changing and
+improving the internal workings of software products, without adding new
+features for end-users [@Kruchten2012; @Cunningham1992].
+While some immature code may be acceptable to deliver a product faster, it 
+should be rewritten promptly, as it negatively affects the maintainability of 
+software.
+In analogy to the financial term, Cunningham considers time spend on
+"not-quite-right code" interest on technical debt.
 
-Recently, such a decision to break backwards compatibility in order to stay 
-relevant was made by the developers of the Java language environment. 
-With the release of Java 9 the fundamental way how code artifacts are organized 
-changed with the introduction of a module system.
+Nowadays, software libraries and platforms are commonly used to improve code
+reuse, increase productivity and consequently reduce cost [@Brito2018].
+While tackling technical debt is usually invisible to users, changes in
+dependencies often entail requiring adaptions in dependent code.
+Software libraries usually value compatibility with previous versions highly to
+not frighten off users with high effort to adapt to new versions.
+Additional technical debt is created by keeping on using outdated and 
+unsupported versions of a library.
+Future development may be simplified, but migrating to newer versions does not
+add additional value to a product.
+
+However, not always is technical debt caused by making wrong choices in
+development originally, but simply by the passing of time, so that in retrospect
+a choice is not quite right [@Kruchten2012].
+
+This was also the reason for a recent change in the Java platform -- the 
+introduction of a module system -- with version 9.
+New ways of distributing applications, such as App Stores on mobile operating
+systems or in Docker containers, and the rise of newer platforms like Go and
+Swift required a fundamental change in order to keep the Java platform relevant 
+[@Reinhold2018].
+
+The module system fundamentally changes how code artifacts are organized and
+distributed, which breaks backwards compatibility with previous versions.
 Although several ways of migrating stepwise to the new system and utilizing the
-new features only partly, the new version of the language presents developers of
-the large ecosystem of Java libraries and applications wanting to migrate with 
-problems.
+new features only partly, the new version is only slowly adapted.
+The impact of a migration to Java 9 is not yet fully understood, especially the
+problems such a migration causes and the required effort is unclear.
 
-While the topic of software maintenance and especially software migration is 
-well studied [@Besker2017; @Chapin2001; @Malton2001; @Mancl2001; @Mayrhauser1995]
+While the topic of software maintenance in general and especially software 
+migration is well studied [@Besker2017; @Chapin2001; @Malton2001; @Mancl2001; @Mayrhauser1995]
 and also the migration of applications to different programming languages is
 covered [@Martin2002], not much literature exists on the topic of migrating 
 applications to newer versions of the same language.
@@ -30,11 +51,21 @@ which is a big factor for backwards compatibility.
 Migration to Java 9 is mainly described in online documentation [@Oracle2017],
 text books [@Inden2018; @Kothagal2017; @Mac2017] and online experience
 reports [@Parlog2017].
+This sparse literature also contributes to the uncertainty a migration to Java
+9 encompasses.
+While some migration guides of artificial applications exist 
+(see e.g. [@Kothagal2017]), and also a case study on migrating an already modular 
+application to Java 9 exists [@Gee2017],
+to the best of the authors knowledge this is the first in-depth case study on
+migrating a real-world Java 8 application to Java 9.
 
 The goal of this thesis is to assess the difficulties that developers encounter
 when migrating applications from Java 8 to Java 9.
 To achieve this, the migration was performed exemplarily on the open source
 bibliography manager JabRef.
+JabRef was chosen, because it is a large, well maintained Java 8 application and
+it being open source makes it easy to find expertise regarding its architecture
+and source code.
 In [@sec:background], first the topic of software migration in general is 
 examined, then the advantages of and the way Java implements modules are 
 analyzed, and the software JabRef is presented.
