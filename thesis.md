@@ -80,6 +80,10 @@ in [@sec:conclusion].
 
 ## Software Migration {#sec:migration}
 
+> What migration type is relevant for this thesis?
+> What problems do they pose?
+> Are there any studies for each of these types?
+
 Software migration is a part of software maintenance [@Dig2006]. 
 In general software maintenance can be classified as adaptive, corrective, 
 perfective, and preventive maintenance tasks [@Malton2001]. 
@@ -159,9 +163,18 @@ cases, or when new keywords were introduced in the language, such as `strictfp`
 in Java 2, `assert` in Java 4 and `enum` in Java 5, which subsequently can no
 longer be used as identifiers.
 
-With Java 9 the *Java Platform Module System* (+JPMS) -- also popular under its
-working name *Jigsaw* -- was introduced the the Java platform among other minor
-changes. 
+Backwards compatibility in programming languages is a double-edged sword: It
+promotes reuse of code and programming skills, but languages attempting a
+significant degree of historical consistency inevitably perpetrate some 
+problematic constructs [@McIver1996].
+
+**To do: Scala, C/C++, ???**
+
+With Java 9 arguably the biggest change since its inception was introduced among    
+minor changes: the *Java Platform Module System* (+JPMS) -- also popular under
+its working name *Jigsaw* [@Mac2017].
+Even though backwards compatibility is a top priority for Java, Java 9
+introduced breaking changes requiring additional migration effort.
 +JPMS adds *modules*, which are identifiable artifacts containing code, to the 
 Java language [@Mac2017].
 The monolithic +JDK itself was also split into smaller modules [@Clark2017].
@@ -198,6 +211,13 @@ with the existing access modifiers (see [@tbl:access]). This can make dependency
 relations unclear for large code bases and violates strong encapsulation 
 principles.
 
+Access modifier | Class    | Package  | Subclass | Unrestricted
+----------------|----------|----------|----------|--------------
+`public`        | \checked | \checked | \checked | \checked
+`protected`     | \checked | \checked | \checked |
+- *(default)*   | \checked | \checked |          |
+`private`       | \checked |          |          |
+
 This becomes even more problematic with the second problem: If more than one 
 type exists with the same fully qualified name, i.e. the package name and the 
 type name is the same, the first one found is used [@Kothagal2017]. This problem 
@@ -209,17 +229,12 @@ reliable configuration of the classpath is difficult and explains the rise of
 tools like Maven or Gradle, that standardize the process of obtaining 
 dependencies and configuring Java to use them [@Kothagal2017].
 
-Access modifier | Class    | Package  | Subclass | Unrestricted
-----------------|----------|----------|----------|--------------
-`public`        | \checked | \checked | \checked | \checked
-`protected`     | \checked | \checked | \checked |
-- *(default)*   | \checked | \checked |          |
-`private`       | \checked |          |          |
-
 : Access modifiers and their associated scopes [@Mac2017] {#tbl:access}
 
 +JPMS aims at exactly these needs of large Java applications: reliable 
 configuration and strong encapsulation [@Clark2017].
+
+**To do: explain reads relation between modules**
 
 Modules have to explicitly declare which packages they make available to other
 modules and which modules they are dependent on [@Mac2017].
@@ -240,6 +255,8 @@ edges represent the implicit dependency of every module on the Java base module
 Java 9 resolves modules every time before an application is compiled or executed 
 [@Kothagal2017]. Thus, it is possible to catch configuration errors like 
 missing modules or multiple modules with the same name directly at startup.
+
+**To do: explain that smaller modules result from JDK being split up**
 
 Additionally due to the smaller modules, instead of one big runtime environment,
 Java 9 is better equipped to be run on devices for the Internet of Things (IoT)
@@ -371,6 +388,8 @@ module com.company.module {
 }
 ```
 
+**To do: explain that packages need to be manually declared not classes, provide usage of how to use**
+
 In this example the module `com.company.module` is declared. It allows access
 from other modules to its packages `com.company.module.api`, 
 `com.company.module.cli` and `com.company.module.gui`. 
@@ -379,16 +398,22 @@ treated like regular identifiers, so if access to subpackages of any of the
 above packages should be allowed, they would have to be explicitly be exported 
 [@Mac2017].
 
+**To do: explain reflection + opens <-> exports differences**
+
 The example module further "opens" the package `com.company.module.api.feature`
 to reflective access from other modules. Reflective access is not granted by
 default, even if a package is exported [@Mac2017]. If a module relies heavily on
 reflection, it may also be declared as an `open module` to allow reflection into
 all its packages.
 
+**To do: explain transitive reads relation**
+
 The module then declares its dependencies on `org.thirdparty.module` and 
 `org.provider.othermodule`, with the second dependency being declared as
 transitive dependency. This means that the module also depends on all 
 dependencies of `org.provider.othermodule`.
+
+**To do: further explain uses <-> requires and provides <-> exports**
 
 The last two declarations identify that the module uses a service
 `org.thirdparty.module.Service` provided by some other class and implements a
@@ -399,6 +424,8 @@ relied on a configuration using text files. The declaration of provided and used
 services is +JPMS form of dependency injection (+DI), also known as the principle
 *Inversion of Control* (+IoC) that allows hiding of implementation details 
 [@Mac2017].
+
+**To do: explain the unnamed module first**
 
 As an alternative to the explicit declaration of a module descriptor, Java 9
 also allows the usage of so called *automatic modules* [@Mac2017]. Automatic
@@ -411,6 +438,8 @@ This version of module declaration is favorable if the module has to maintain
 backwards compatibility with previous Java versions. Especially library 
 maintainers are often hesitant to migrate to the latest Java version to not
 lose their consumers using older versions.
+
+**To do: explain more and applications of this**
 
 The third variant of modules is the so-called *unnamed module* [@Inden2018]. In
 contrast to explicit modules and automatic modules, which are put on the 
@@ -435,12 +464,16 @@ so that backwards compatibility for applications depending on them is ensured,
 however it is planned that those classes are replaced with supported 
 alternatives in a future Java version [@Mac2017].
 
+**To do: more detailed overview of command line options and where available**
+
 While Java 9 still provides the possibility to explicitly make the internal ++API
 available with command line switches like `--add-exports`, the only long-term
 solution is to move away from those ++API and find supported replacement 
 solutions [@Inden2018]. Corresponding to that, the switch `--add-opens` exists
 for allowing reflection into packages of modules, that do not explicitly open
 packages.
+
+**To do: make this more detailed: not only exported**
 
 The second restriction is that modules are no longer allowed to have split
 packages [@Mac2017]. Split packages are packages with the same name, that are
@@ -467,6 +500,8 @@ module.one and module.two
 ```
 
 ## JabRef Bibliography Manager {#sec:jabref}
+
+**To do: explain use case and similar apps**
 
 JabRef is an open source bibliography reference manager using the standard LaTeX
 bibliography format BibTeX as its native file format.
@@ -496,6 +531,8 @@ The communication between the components of JabRef is implemented using an event
 bus, that allows publishing events and registering listeners for events. This 
 allows to react upon changes in the core and still react in the upper layers, 
 while keeping the components clearly separated.
+
+**To do: Java 8, not runnable with Java 9, how many dependencies?**
 
 The source code of JabRef is build using the tool Gradle. Gradle automates
 repeated tasks such as compilation of the source code, building release 
@@ -537,6 +574,8 @@ A number of external libraries were incompatible with Java 9 and also had to be
 removed.
 The incompatibilities of these libraries can be categorized into the following 
 categories.
+
+**To do: which?**
 
 First, four libraries exported the same packages, resulting in a split package
 as explained in [@sec:j9_mig]. These libraries were the popular utility library
@@ -640,6 +679,8 @@ for JabRef (see [@sec:j9_impl]).
 While it would have been possible to make JabRef an automatic module, instead of
 an explicit one, there were already efforts for creating a descriptor due to the
 open source nature of JabRef.
+
+**To do: explain the descriptor more**
 
 [@lst:jabref-module] shows an excerpt from the module descriptor. 
 The module was declared as open module to allow all internal access into JabRef,
@@ -848,6 +889,8 @@ BackgroundTask.wrap(this::verifyDuplicates)
               .executeWith(Globals.TASK_EXECUTOR);
 ```
 
+**To do: explain this more**
+
 [@lst:background_task] shows how background tasks are used in JabRef. The
 method `verifyDuplicates` is executed on a thread of the `Globals.TASK_EXECUTOR`
 executor service. When the verification of duplicates succeeds the method
@@ -855,6 +898,8 @@ executor service. When the verification of duplicates succeeds the method
 in this case.
 
 # Modularizing JabRef {#sec:modularization}
+
+**To do: only runnable with restrictions**
 
 After JabRef was running with Java 9, the next goal was to modularize the 
 application in order to reinforce the architectural rules as shown in 
@@ -881,6 +926,8 @@ Internal conflicts required appropriate refactoring according to the problems
 at hand. Once the new module compiles without errors, the packages that should
 be exported could be declared. Lastly, the application with the extracted module
 was ran to ensure the functionality of the application.
+
+**To do: components? modules?**
 
 The modularization was performed with a bottom-up approach. First the components
 with no dependencies on other components were extracted, then the components
@@ -909,6 +956,8 @@ exist in the code base, this might be a practical solution. In JabRef's case
 however, this was the only occurrence of this problem, so changing the the
 architecture of the application to make one component available is not the ideal
 solution.
+
+**To do: not always worse maintainability due to duplication**
 
 Second, the dependency on the Preferences module could be removed. Depending on
 the type of the dependency this may be a viable solution, for example if 
@@ -1111,6 +1160,8 @@ source projects.
 
 
 # Conclusion {#sec:conclusion}
+
+> I'm missing a more detailed discussion of the discovered problems and what implications they have on migrations to Java 9 in general. How easy and feasible is a migration of real-world apps...
 
 The Java programming language has experienced high popularity in many
 enterprises and also from private developers since its initial release in 1996.
