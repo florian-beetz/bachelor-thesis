@@ -218,6 +218,8 @@ Access modifier | Class    | Package  | Subclass | Unrestricted
 - *(default)*   | \checked | \checked |          |
 `private`       | \checked |          |          |
 
+: Access modifiers and their associated scopes [@Mac2017] {#tbl:access}
+
 This becomes even more problematic with the second problem: If more than one 
 type exists with the same fully qualified name, i.e. the package name and the 
 type name is the same, the first one found is used [@Kothagal2017]. This problem 
@@ -228,8 +230,6 @@ it was running for some time and a class is used for the first time. Thus
 reliable configuration of the classpath is difficult and explains the rise of
 tools like Maven or Gradle, that standardize the process of obtaining 
 dependencies and configuring Java to use them [@Kothagal2017].
-
-: Access modifiers and their associated scopes [@Mac2017] {#tbl:access}
 
 +JPMS aims at exactly these needs of large Java applications: reliable 
 configuration and strong encapsulation [@Clark2017].
@@ -464,14 +464,51 @@ so that backwards compatibility for applications depending on them is ensured,
 however it is planned that those classes are replaced with supported 
 alternatives in a future Java version [@Mac2017].
 
-**To do: more detailed overview of command line options and where available**
+While Java 9 provides to modify and partly circumvent the module system with
+command line switches to both the Java launcher `java` and the Java compiler
+`javac` as shown in [@tbl:commandline_flags], the only long-term solution is to
+move away from deprecated, unsupported ++API and find supported replacement 
+solutions [@Inden2018].
+The command line switches can be used to override module descriptors to export
+packages or open packages to reflection, or manually add a reads relation 
+between modules.
+The `--add-opens` switch is only available for `java`, as reflective access is
+not validated at compile-time.
+The switch `--add-modules` makes Java resolve additional modules, that are not
+explicitly declared as required from other modules.
+It also has the special values `ALL-DEFAULT`
+With the `--patch-module` additional files and classes can be added to a module.
+This is usefull for example to add unit tests to a module, that otherwise could
+not access the required classes in the module.
 
-While Java 9 still provides the possibility to explicitly make the internal ++API
-available with command line switches like `--add-exports`, the only long-term
-solution is to move away from those ++API and find supported replacement 
-solutions [@Inden2018]. Corresponding to that, the switch `--add-opens` exists
-for allowing reflection into packages of modules, that do not explicitly open
-packages.
+--------------------------------------------------------------------------------
+Switch                  `java`      `javac`     Function
+----------------------- ----------- ----------- --------------------------------
+`--add-exports`         \checked    \checked    Adds additional exported 
+                                                packages in the form 
+                                                `module/package=targetmodule`.
+                                                           
+`--add-reads`           \checked    \checked    Updates a module to read a 
+                                                target module. Specified in 
+                                                the form `module=targetmodule`.
+                                                
+`--add-opens`           \checked                Updates a module to open a 
+                                                package to a target module. 
+                                                Specified in the form 
+                                                `module/package=targetmodule`.
+                                                
+`--add-modules`         \checked    \checked    Specifies additional modules
+                                                to resolve. Specified as
+                                                `module[,module]` or a special
+                                                value.
+                                                
+`--patch-module`        \checked    \checked    Overrides or augments a module
+                                                with classes or resources.
+                                                Specified as 
+                                                `module=file[,file]`.
+--------------------------------------------------------------------------------
+
+: Access modifiers and their associated scopes [@OracleDocJava; @OracleDocJavac] {#tbl:commandline_flags}
 
 **To do: make this more detailed: not only exported**
 
