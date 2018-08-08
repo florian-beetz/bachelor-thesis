@@ -785,13 +785,39 @@ libraries containing packages of the +JDK does no longer work in Java 9.
 
 ## JabRef Bibliography Manager {#sec:jabref}
 
-**To do: explain use case and similar apps**
-
-JabRef is an open source bibliography reference manager using the standard LaTeX
-bibliography format BibTeX as its native file format.
+JabRef is a free open source bibliography reference manager using the standard
+LaTeX bibliography format BibTeX as its native file format.
 The project is hosted on 
 GitHub^[[https://github.com/JabRef/jabref](https://github.com/JabRef/jabref)] 
 and currently has over 200 contributors and around 140,000 lines of Java code.
+
+JabRef aims at assisting researchers to organize their references for thesises,
+papers and other scientific work.
+It has a wide range of features, that help collecting literature, organizing and
+sharing it when working in a team.
+The interfaces with online scientific catalogs such as Google Scholar, CrossRef
+or IEEE Xplore allow searching for articles and directly importing it into a
+local database.
+JabRef's integrations with popular applications like TeXstudio or LibreOffice
+allow users to insert citations easily.
+
+Similar features are provided by the application Zotero^[[https://www.zotero.org/](https://www.zotero.org/)].
+Like JabRef, Zotero is also open source software for managing bibliography.
+The focus of Zotero lies more on integrating well with word processors, wheras
+JabRef focuses more on the integration with LaTeX.
+
+Another similar application for organizing literature is Mendeley^[[https://www.mendeley.com/](https://www.mendeley.com/)].
+Mendeley supports mobile platforms iOS and Android, additionally to the
+desktop platforms Microsoft Windows, OS X and Linux, that JabRef supports.
+Similar to JabRef, Mendeley also supports sharing databases, but then stores
+databases on their servers.
+
+A propriatiary alternative is Citavi^[[https://citavi.com](https://citavi.com)].
+While a free version is available, this version has a limit on 100 articles
+per database.
+In general the features of Citavi and JabRef are different that Citavi is more
+intended as an application to organize knowledge, instead of limiting itself to
+just literature as JabRef does.
 
 According to a survey carried out in 2015 across its users, JabRef is most 
 commonly used by German, English and French speakers [@JabRefDevelopers2015]. It 
@@ -816,7 +842,11 @@ bus, that allows publishing events and registering listeners for events. This
 allows to react upon changes in the core and still react in the upper layers, 
 while keeping the components clearly separated.
 
-**To do: Java 8, not runnable with Java 9, how many dependencies?**
+Currently JabRef is build using Java 8 and does not run nor compile with Java 9.
+Since November 2017 its open source community works on compiling JabRef with
+Java 9^[[https://github.com/JabRef/jabref/pull/3421](https://github.com/JabRef/jabref/pull/3421)].
+The current version of JabRef has 88 dependencies on third-party libraries,
+including transitive dependencies.
 
 The source code of JabRef is build using the tool Gradle. Gradle automates
 repeated tasks such as compilation of the source code, building release 
@@ -878,7 +908,7 @@ solution was to explicitly exclude it in the Gradle build script as shown in
 ```{#lst:jsr-exclusion .java caption="Exclusion of the JSR 305 dependency"}
 configurations {
     // [...]
-point that shoudld
+
     compile {
         exclude group: 'com.google.code.findbugs', module: 'jsr305'
     }
