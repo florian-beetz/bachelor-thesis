@@ -607,7 +607,7 @@ public abstract class FileSystemProvider {
 
         ServiceLoader<FileSystemProvider> sl = ServiceLoader
             .load(FileSystemProvider.class, 
-                    ClassLoader.getSystemClassLoader());
+                ClassLoader.getSystemClassLoader());
 
         // ServiceConfigurationError may be throw here
         for (FileSystemProvider provider: sl) {
@@ -738,21 +738,33 @@ Switch                  `java`      `javac`     Function
 
 : Command Line Switches to enable easy Migration to Java 9 [@OracleDocJava; @OracleDocJavac] {#tbl:commandline_flags}
 
-**To do: make this more detailed: not only exported**
-
 The second restriction is that modules are no longer allowed to have split
 packages [@Mac2017]. Split packages are packages with the same name, that are
 contained in two or more modules.
 [@fig:split_packages] shows two modules where both contain the packages 
-`splitpackage` and `splitpackage.internal`. 
+`splitpackage` and `splitpackage.internal`.
+This example considers the package `splitpackage` to be exported, and the
+package `splitpackage.internal` to be not exported.
 
 ![Split Packages across several Modules](images/split_packages.svg){#fig:split_packages}
 
-If split packages were allowed, this would lead to inconsistencies in the
-encapsulation, as Java has a special visibility level for classes in the same
-package.
-It also could become unclear which class should be used, if two modules contain
-classes with the exact same fully qualified name.
+As mentioned in [@sec:j9_adv], split packages were already a problem before
+Java 9.
+If this were allowed, a class with the same name could be defined in both
+modules and it would become unclear from which module the class should be
+loaded [@Mac2017].
+
+Although not exported split packages would theoretically not cause any issues
+in the encapsulation, as it would be clear for each module to use its own split
+package, also this case is not allowed [@Mac2017].
+The same classloader is used for loading both modules, and each classloader may
+only have a single definition of each package, regardless whether it is
+encapsulated or not.
+
+When creating modules from scratch, the solution to avoid split package is to
+not create them in the first place, when migrating existing applications to
+Java 9, the packages must be renamed or both packages put into one module
+[@Mac2017].
 
 Split packages across libraries cause runtime or compile-time errors such as the 
 one shown in [@lst:split-pkg-err].
@@ -763,6 +775,13 @@ and module.two
 error: the unnamed module reads package splitpackage.internal from both
 module.one and module.two
 ```
+
+The only exception when split packages are allowed, is when they occur between
+automatic modules and the unnamed module [@Mac2017].
+However, in that case the package from the automatic module will be used.
+The package in the unnamed module will be ignored.
+The common practice to override or augment packages of the +JDK by putting
+libraries containing packages of the +JDK does no longer work in Java 9.
 
 ## JabRef Bibliography Manager {#sec:jabref}
 
