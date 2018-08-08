@@ -256,13 +256,44 @@ Java 9 resolves modules every time before an application is compiled or executed
 [@Kothagal2017]. Thus, it is possible to catch configuration errors like 
 missing modules or multiple modules with the same name directly at startup.
 
-**To do: explain that smaller modules result from JDK being split up**
+The modules are resolved from the module path Java 9 introduced [@Mac2017].
+While it is still possible with Java 9 to use non-modular code with the
+classpath, modular code should be placed on the module path.
+Modules are still distributed as ++JAR, but if a +JAR contains a module it is
+referred to as a *modular +JAR*, the file format however is the same as for
+regular ++JAR.
 
-Additionally due to the smaller modules, instead of one big runtime environment,
-Java 9 is better equipped to be run on devices for the Internet of Things (IoT)
-[@Inden2018]. Those devices often have heavy restrictions on storage space and
-now do no longer have to store the full runtime environments, but only those 
-parts that are required to run the respective application.
+[@fig:modulepath] shows an schematic module path as it would be specified to
+Java.
+This example has three modular ++JAR on the module path, containing module A, B
+and C respectively.
+Here the only dependency is from module A to module B.
+
+![Schematic Module Path](images/modulepath.svg){#fig:modulepath}
+
+In contrast to the classpath, the module path only resolves the required
+modules based on the context [@Mac2017].
+So if for example a main class `MainA` in module A should be executed, the
+module path would be resolved as shown in [@fig:modulepath_resolved].
+Only module A and B, but not module C would actually be resolved, as it is not
+required by module A nor B.
+
+![Resolved Module Path](images/modulepath_resolved.svg){#fig:modulepath_resolved}
+
+In a different context, the same module path may be resolved differently.
+If for example another module D would be compiled with the module path above,
+and module D depends on the modules A and C, then all three modules would be
+resolved.
+This resolution of modules amounts to calculating the transitive closure in the
+available modules.
+
+This resolve strategy brings also an additional benefit with it: Java 9 is
+better equipped to be run on devices for the Internet of Things (+IoT) 
+[@Inden2018].
+The modularization of the +JDK itself allows to only distribute modules that are
+required to run an application instead of the full +JDK.
++IoT devices often have heavy restrictions on storage space, so that shipping
+a large monolithic +JDK on such devices would be unacceptable.
 
 ### Modular Code before Java 9 {#sec:j9_before}
 
@@ -368,84 +399,268 @@ To make use of +JPMS in Java 9 a module has to declare its public packages and
 its dependencies as mentioned in [@sec:j9_adv]. This is done using a module
 descriptor, a file called `module-info.java` in the root package, that will be
 compiled as classes to a file called `module-info.class` [@Mac2017]. 
-[@lst:module-desc] shows an example of such a module descriptor.
+[@lst:module-desc] shows the module descriptor of the default Java module
+`java.prefs` that contains Java's Preferences +API as an example^[All examples in [@sec:j9_impl] were taken from the source code of Oracle's JDK version 9.0.4. The source code is available in `${JAVA_HOME}\lib\src.zip`.].
 
-```{#lst:module-desc .java caption="Module descriptor"}
-module com.company.module {
-    exports com.company.module.api;
-    exports com.company.module.cli;
-    exports com.company.module.gui;
+```{#lst:module-desc .java caption="Excerpt of Module Descriptor of `java.prefs`"}
+module java.prefs {
+    requires java.xml;
 
-    opens com.company.module.api.feature;
-
-    requires org.thirdparty.module;
-    requires transitive org.provider.othermodule;
-
-    uses org.thirdparty.module.Service;
-
-    provides com.company.module.api.Service
-        with com.company.module.api.impl.ServiceImpl;
+    exports java.util.prefs;
+    // [...]
 }
 ```
 
-**To do: explain that packages need to be manually declared not classes, provide usage of how to use**
+This module declares a dependency on the module `java.xml`, that contains Java's
+++API +JAXP (Java +API for +XML Processing), +StAX (Streaming +API for +XML),
++SAX (Simple +API for +XML) and the +W3C Document Object Model (+DOM) +API with
+a `requires` clause.
+It also makes the package `java.util.prefs` available for other modules by
+exporting it and uses a service of the type
+`java.util.prefs.PreferencesFactory`.
+However, although Java packages seem to be hierarchical with a `.` to sperate
+levels, package names are treated as arbitrary identifiers [@Mac2017].
+This means if a subpackage of `java.util.prefs` were to be exported here, it
+would have to be explicitly declared as exported.
 
-In this example the module `com.company.module` is declared. It allows access
-from other modules to its packages `com.company.module.api`, 
-`com.company.module.cli` and `com.company.module.gui`. 
-Note however that although Java packages seem to appear hierarchical, they are
-treated like regular identifiers, so if access to subpackages of any of the
-above packages should be allowed, they would have to be explicitly be exported 
+As shown in [@sec:j9_adv], from such module descriptors can be derived.
+In +JPMS, there are two important concepts to reason about relations between
+modules: *Readability* and *Accessibility* [@Mac2017].
+
+Reading another module means the types of its exported packages can be
+accessed by other modules [@Mac2017].
+Readability relations between modules can be set up using the `requires` clause
+in the module descriptor.
+By definition every module reads itself, but the reads relation is by default
+not transitive.
+
+So inside the `java.prefs` module, accessing types from the `java.xml` module
+like the `Document` type is allowed as shown in the excerpt of the class
+`java.util.prefs.XmlSupport` in [@lst:reads-example], but a module that only
+`requires java.prefs` can not access types from `java.xml`.
+
+```{#lst:reads-example .java caption="Excerpt of `java.util.prefs.XmlSupport`"}
+package java.util.prefs;
+// ...
+import org.w3c.dom.*;
+// ...
+class XmlSupport {
+    static void importPreferences(InputStream is)
+        throws IOException, InvalidPreferencesFormatException
+    {
+        try {
+            Document doc = loadPrefsDoc(is);
+            // ...
+        }
+    }
+    // ...
+}
+```
+
+If a transitive reads relation is required, modules can declare that with a
+`requires transitive` clause as shown for Java's `java.sql` module in
+[@lst:java.xml].
+This module not only requires the modules `java.logging` and `java.sql`, but
+also all of the modules that are required by these modules.
+
+```{#lst:java.xml .java caption="Excerpt of Module Descriptor of `java.sql`"}
+module java.sql {
+    requires transitive java.logging;
+    requires transitive java.xml;
+
+    exports java.sql;
+    exports javax.sql;
+    exports javax.transaction.xa;
+    // [...]
+}
+```
+
+The second concept is accessibility.
+As shown in [@sec:j9_adv] accessibility was already a concept before Java 9.
+Combining accessibility with readability achieves the strong encapsulation that
+was a goal of +JPMS [@Mac2017].
+The verification that a type T in package P from module M1
+is accessible from module M2 is threefold:
+
+1. Does M2 read M1?
+2. If it does, does M1 export the package P?
+3. Is type T accessible in package P?
+
+This makes only public types in exported packages accessible from other modules,
+non-public types are blocked from use with the traditional accessibility rules
+as shown in [@sec:j9_adv].
+Another change in +JPMS concerns Java's reflection. Reflection is a form of
+metaprogramming, i.e. a program can generate or modify parts of itself.
+Before Java 9 it was possible to change accessibility of classes and their
+members at runtime as shown in [@lst:reflection].
+This example reflectively sets the method `someMethod()` of an object accessible
+regardless wheter it was accessible before or not and invokes it.
+
+```{#lst:reflection .java caption="Changing Accessibility at Runtime using Reflection"}
+public static void callInaccessibleMethod(Object object)
+        throws Exception {
+    Method method = object.getClass().getMethod("someMethod");
+    method.setAccessible(true);
+    method.invoke(object);
+}
+```
+
+This is no longer possible with Java 9, unless a package is declared as an 
+*open package* or the whole module is defined as *open module* [@Mac2017].
+This is done using the `opens` clause on a package in the module descriptor.
+[@lst:jdk.unsupported] shows how this is done in Java's module `jdk.unsupported`
+as an example.
+This allows reflection in the packages `sun.misc` and `sun.reflect` from any
+module that requires this module.
+
+```{#lst:jdk.unsupported .java caption="Module descriptor of `jdk.unsupported`"}
+module jdk.unsupported {
+    exports sun.misc;
+    exports sun.reflect;
+    exports com.sun.nio.file;
+
+    opens sun.misc;
+    opens sun.reflect;
+}
+```
+
+Alternatively, if all packages should be open for reflection, the module can be
+declared as `open module module.name {}`.
+However, open packages are not exported automatically, likewise are the packages
+of an open module not exported [@Mac2017].
+If open packages should also be exported, an explicit `exports` clause is
+required.
+
++JPMS allows even more fine grained control of accessibility: Both `exports` and
+`opens` clauses also have a qualified variant, where the modules, that are
+allowed to access the exported or opened packages, are explicitly specified
 [@Mac2017].
+This is for example done in Java's module `java.xml.ws` as shown in
+[@lst:java.xml.ws], that opens its package `javax.xml.ws.wsaddressing` only to
+the `java.xml.bind` module.
 
-**To do: explain reflection + opens <-> exports differences**
+```{#lst:java.xml.ws .java caption="Excerpt of the module descriptor of `java.xml.ws`"}
+module java.xml.ws {
+    // [...]
+    opens javax.xml.ws.wsaddressing to java.xml.bind;
+    // [...]
+}
+```
 
-The example module further "opens" the package `com.company.module.api.feature`
-to reflective access from other modules. Reflective access is not granted by
-default, even if a package is exported [@Mac2017]. If a module relies heavily on
-reflection, it may also be declared as an `open module` to allow reflection into
-all its packages.
+This has applications for ++API that rely heavily on reflection.
+In the above example, the opened package contains entities that are serialized
+to +XML using +JAXB (Java Architecture for +XML Binding), that requires the
+reflective access to the package to read the annotations of the classes, but
+other modules should not be able to access those classes.
 
-**To do: explain transitive reads relation**
++JPMS also implements strong encapsulation by providing a way for modules to
+declare services they provide and use [@Mac2017].
+Services are +JPMS' dependency injection (+DI) mechanism, also known as the
+principle of Inversion of Control (+IoC), that hides implementation details from
+consumers.
 
-The module then declares its dependencies on `org.thirdparty.module` and 
-`org.provider.othermodule`, with the second dependency being declared as
-transitive dependency. This means that the module also depends on all 
-dependencies of `org.provider.othermodule`.
+An example of how this is used in the +JDK itself is shown in [@lst:java.base].
+This module contains the +NIO  (Non-blocking Input/Output) +API, that can work
+with several file systems.
+The abstract class `java.nio.file.spi.FileSystemProvider` provides the interface
+to create `FileSystem` instances for different types of file systems.
 
-**To do: further explain uses <-> requires and provides <-> exports**
+```{#lst:java.base .java caption="Excerpt of the Module Descriptor of `java.base`"}
+module java.base {
+    // [...]
+    exports java.nio;
+    // [...]
+    uses java.nio.file.spi.FileSystemProvider;
+    // [...]
+}
+```
 
-The last two declarations identify that the module uses a service
-`org.thirdparty.module.Service` provided by some other class and implements a
-service `com.company.module.api.Service` with the class 
-`com.company.module.api.impl.ServiceImpl` for usage by other modules. This
-declaration of services was already a feature of Java before version 9, but
-relied on a configuration using text files. The declaration of provided and used
-services is +JPMS form of dependency injection (+DI), also known as the principle
-*Inversion of Control* (+IoC) that allows hiding of implementation details 
+This `FileSystemProvider` service is provided at multiple instances in the +JDK
+itself.
+One example of implemented file system is the ZIP file system that maps files
+in a ZIP file as a virtual file system.
+This file system is implemented in the module `jdk.zipfs`, [@lst:jdk.zipfs]
+shows its module descriptor.
+
+```{#lst:jdk.zipfs .java caption="Module Descriptor of `jdk.zipfs`"}
+module jdk.zipfs {
+    provides java.nio.file.spi.FileSystemProvider 
+        with jdk.nio.zipfs.ZipFileSystemProvider;
+}
+```
+
+This module does not export or open any packages, but only provide an
+implementation of the `FileSystemProvider` service.
+This can be done, because the actual implementation does not matter for the
+consumer, so the concrete class that implements the service must not even be
+known to clients.
+[@lst:service-usage] shows how the `FileSystemProvider` services are loaded at
+runtime.
+Additional implementations could be simply added on the module path and could
+then be used transparently to consumers of the +API.
+
+```{#lst:service-usage .java caption="Usage of JPMS Services"}
+package java.nio.file.spi;
+// [...]
+public abstract class FileSystemProvider {
+    // [...]
+    private static List<FileSystemProvider> loadInstalledProviders() {
+        List<FileSystemProvider> list = new ArrayList<>();
+
+        ServiceLoader<FileSystemProvider> sl = ServiceLoader
+            .load(FileSystemProvider.class, ClassLoader.getSystemClassLoader());
+
+        // ServiceConfigurationError may be throw here
+        for (FileSystemProvider provider: sl) {
+            // [...]
+        }
+        return list;
+    }
+    // [...]
+}
+```
+
+Although a module descriptor is required to utilize the full set of features of
++JPMS, two alternatives were implemented in Java 9 to allow usage of older
+libraries.
+
+The first alternative is the so-called *unnamed module*, which aggregates all
+sources put on the classpath [@Inden2018].
+Thus only one unnamed module exists.
+Secondly, there are so-called *automatic modules* [@Mac2017].
+++JAR that do not have a module descriptor but are put on the module path are
+interpreted as automatic modules.
+
+However, both come with downsides [@Mac2017; @Inden2018]:
+First, they can not declare the packages they export, so they export every
+package.
+Second, they can not declare their dependencies, so automatic modules are
+treated as if they had declared a `requires transitive` clause on every other
+resolved module on the module path in addition to the unnamed module.
+The unnamed module however can not read any module, all dependencies need to be
+on the classpath, too.
+
+In contrast to the unnamed modules, automatic modules require a module name
 [@Mac2017].
+This name is derived from the attribute `Automatic-Module-Name` in the +JAR
+manifest `META-INF/MANIFEST.MF` or from the +JAR file name if that attribute is
+not present.
 
-**To do: explain the unnamed module first**
-
-As an alternative to the explicit declaration of a module descriptor, Java 9
-also allows the usage of so called *automatic modules* [@Mac2017]. Automatic
-Modules do not have a module descriptor, their name is derived from the 
-attribute `Automatic-Module-Name` in the +JAR manifest `META-INF/MANIFEST.MF` or
-from the name of the +JAR file if that attribute is not present.
-An automatic module has some special characteristics: It `requires transitive`
-all other resolved modules, exports all its packages and reads the classpath.
-This version of module declaration is favorable if the module has to maintain
-backwards compatibility with previous Java versions. Especially library 
-maintainers are often hesitant to migrate to the latest Java version to not
-lose their consumers using older versions.
-
-**To do: explain more and applications of this**
-
-The third variant of modules is the so-called *unnamed module* [@Inden2018]. In
-contrast to explicit modules and automatic modules, which are put on the 
-*modulepath*, the unnamed module consists of all code that is put on the
-classpath. The unnamed module is treated like code before Java 9. Automatic
-modules can access code in the unnamed module, while explicit modules cannot.
+Although explicit modules are far more powerful, both have a justified
+existence.
+The unnamed module can be used to when one does not want to use +JPMS and
+wants to migrate to Java 9 with minimal effort.
+Automatic modules are useful when one needs to compile an application or library
+with a previous Java version.
+Since Java is not forward compatible, code compiled with a later Java version is
+not runnable with a previous version, e.g. a library compiled with Java 9 can
+not be executed on a Java 8 platform.
+Since the module descriptor is a feature only from Java 9 on and many libraries
+support still support Java 8 or even previous versions, library maintainers
+often chose to distribute their library as an automatic module.
+Hence, migrating Java libraries to Java 9 with +JPMS would force all clients of
+the library to also migrate to Java 9, if they want to use the latest version of
+the library.
 
 ### Migrating to Modular Code {#sec:j9_mig}
 
@@ -478,7 +693,7 @@ The switch `--add-modules` makes Java resolve additional modules, that are not
 explicitly declared as required from other modules.
 It also has the special values `ALL-DEFAULT`
 With the `--patch-module` additional files and classes can be added to a module.
-This is usefull for example to add unit tests to a module, that otherwise could
+This is useful for example to add unit tests to a module, that otherwise could
 not access the required classes in the module.
 
 --------------------------------------------------------------------------------

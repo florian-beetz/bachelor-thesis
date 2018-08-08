@@ -7,3 +7,4 @@ Things that need to be done before release.
 * [ ] Check cite ordering
 * [ ] Update syntax highlighting
 * [ ] Check citations in listings
+* [ ] Check for `code` in listing captions
