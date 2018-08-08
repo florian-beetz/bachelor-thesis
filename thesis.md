@@ -889,21 +889,20 @@ removed.
 The incompatibilities of these libraries can be categorized into the following 
 categories.
 
-**To do: which?**
+At first, the popular utility libary *Google Guava*, the +SDK of the office
+suite *LibreOffice*, Microsoft's monitoring service *ApplicationInsignts* and
+*ArchUnit*, a test frame work to check for architecture constraints, caused
+problems because of split packages.
 
-First, four libraries exported the same packages, resulting in a split package
-as explained in [@sec:j9_mig]. These libraries were the popular utility library
-*Google Guava*, the +SDK of the office suite *LibreOffice*, Microsoft's 
-monitoring service *ApplicationInsights* and *ArchUnit*, a test framework to
-check for architecture constraints.
-
-While Google Guava did not actually contain a split package, it had a 
+While Google Guava did not actually contain a split package itself, it had a
 dependency on an unofficial implementation of Java annotations as specified by
 the Java Specification Request (+JSR) 305, that aims at assisting tools to find
-software defects by providing annotations such as `@NonNull` [@Pugh2006]. 
-However, this dependency was optional and thus not required at runtime, so the 
+software defects by providing annotations such as `@NonNull` [@Pugh2006].
+This implementation declares its annotations in the package `javax.annotation`,
+however, this a package used by the +JDK itself.
+However, this dependency was optional and thus not required at runtime, so the
 solution was to explicitly exclude it in the Gradle build script as shown in
-[@lst:jsr-exclusion]. 
+[@lst:jsr-exclusion].
 
 ```{#lst:jsr-exclusion .java caption="Exclusion of the JSR 305 dependency"}
 configurations {
@@ -1271,12 +1270,10 @@ however, this was the only occurrence of this problem, so changing the the
 architecture of the application to make one component available is not the ideal
 solution.
 
-**To do: not always worse maintainability due to duplication**
-
 Second, the dependency on the Preferences module could be removed. Depending on
 the type of the dependency this may be a viable solution, for example if 
 alternatives for the used functionalities are available. In this case however,
-removing the dependency would have lead to code duplication, which is 
+removing the dependency would have lead to code duplication, which is often
 unfavorable for enabling good software maintainability.
 
 Third, the components Logic and Preferences could be joined in one module. This
