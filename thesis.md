@@ -234,8 +234,6 @@ dependencies and configuring Java to use them [@Kothagal2017].
 +JPMS aims at exactly these needs of large Java applications: reliable 
 configuration and strong encapsulation [@Clark2017].
 
-**To do: explain reads relation between modules**
-
 Modules have to explicitly declare which packages they make available to other
 modules and which modules they are dependent on [@Mac2017].
 Packages that are not exported by a module can not be used in other modules.
@@ -400,7 +398,7 @@ its dependencies as mentioned in [@sec:j9_adv]. This is done using a module
 descriptor, a file called `module-info.java` in the root package, that will be
 compiled as classes to a file called `module-info.class` [@Mac2017]. 
 [@lst:module-desc] shows the module descriptor of the default Java module
-`java.prefs` that contains Java's Preferences +API as an example^[All examples in [@sec:j9_impl] were taken from the source code of Oracle's JDK version 9.0.4. The source code is available in `${JAVA_HOME}\lib\src.zip`.].
+`java.prefs` that contains Java's Preferences +API as an example^[All examples in [@sec:j9_impl] were taken from the source code of Oracle's JDK version 9.0.4. The source code is available in `${JAVA_HOME}/lib/src.zip`.].
 
 ```{#lst:module-desc .java caption="Excerpt of Module Descriptor of `java.prefs`"}
 module java.prefs {
@@ -608,7 +606,8 @@ public abstract class FileSystemProvider {
         List<FileSystemProvider> list = new ArrayList<>();
 
         ServiceLoader<FileSystemProvider> sl = ServiceLoader
-            .load(FileSystemProvider.class, ClassLoader.getSystemClassLoader());
+            .load(FileSystemProvider.class, 
+                    ClassLoader.getSystemClassLoader());
 
         // ServiceConfigurationError may be throw here
         for (FileSystemProvider provider: sl) {
@@ -695,6 +694,17 @@ It also has the special values `ALL-DEFAULT`
 With the `--patch-module` additional files and classes can be added to a module.
 This is useful for example to add unit tests to a module, that otherwise could
 not access the required classes in the module.
+The `--illegal-access` switch specifies how illegal reflective access should be
+handled at runtime.
+Possible values for the switch are `permit`, `warn`, `debug` and `deny`.
+`permit` allows all reflective access, so both reflective as well as static
+access to encapsulated code is possible as it was before Java 9.
+`warn` does the same as `permit`, but prints a warning every time an illegal
+access orccurs.
+`debug` does the same as `warn`, but prints a complete stack trace when an
+illegal access occurs.
+`deny` denies all illegal accesses, except those explicitly allowed with other
+command line switches such as `--add-opens`.
 
 --------------------------------------------------------------------------------
 Switch                  `java`      `javac`     Function
@@ -721,9 +731,12 @@ Switch                  `java`      `javac`     Function
                                                 with classes or resources.
                                                 Specified as 
                                                 `module=file[,file]`.
+
+`--illegal-access=`     \checked                Specifies how illegal access
+                                                should be handled at runtime.
 --------------------------------------------------------------------------------
 
-: Access modifiers and their associated scopes [@OracleDocJava; @OracleDocJavac] {#tbl:commandline_flags}
+: Command Line Switches to enable easy Migration to Java 9 [@OracleDocJava; @OracleDocJavac] {#tbl:commandline_flags}
 
 **To do: make this more detailed: not only exported**
 
