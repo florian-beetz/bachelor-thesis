@@ -1247,13 +1247,12 @@ the user feedback.
 
 # Modularizing JabRef {#sec:modularization}
 
-**To do: only runnable with restrictions**
-
-After JabRef was running with Java 9, the next goal was to modularize the 
-application in order to reinforce the architectural rules as shown in 
-[@sec:jabref], but also to extract useful libraries for other applications. In
-the past there already efforts to extract libraries from JabRef using the build
-tool Gradle's support for modules^[[https://github.com/JabRef/jabref/pull/3704](https://github.com/JabRef/jabref/pull/3704)].
+After JabRef was running with Java 9 and all dependencies, that had updates
+supporting Java 9 available, were updated, the next goal was to modularize the
+application in order to reinforce the architectural rules as shown in
+[@sec:jabref], but also to extract useful libraries for other applications.
+In the past there were already efforts to extract libraries from JabRef using
+the build tool Gradle's support for modules^[[https://github.com/JabRef/jabref/pull/3704](https://github.com/JabRef/jabref/pull/3704)].
 Using this approach JabRef would not produce one monolithic +JAR artifact, but
 several smaller +JAR artifacts depending on each other. The problems that +JPMS 
 addresses (see [@sec:j9_adv]), however, would not be addressed using this 
@@ -1275,13 +1274,36 @@ at hand. Once the new module compiles without errors, the packages that should
 be exported could be declared. Lastly, the application with the extracted module
 was ran to ensure the functionality of the application.
 
-**To do: components? modules?**
+The modularization was performed with a bottom-up approach.
+First the Module component was extracted to a seperate module, as it has no
+dependencies on any other components.
+Then the Logic component was extracted as module, as it only depends on the
+Model component.
+This was done to avoid circular dependencies, which are disallowed by +JPMS
+[@Mac2017].
+Due to time constraints of this thesis and the strong coupling of the
+components, the Preferences, +GUI and +CLI components could not be extracted to
+seperate modules, but were left as one module.
 
-The modularization was performed with a bottom-up approach. First the components
-with no dependencies on other components were extracted, then the components
-with only dependencies on already modularized components were extracted and so
-forth. This was done to avoid circular dependencies, which are disallowed by 
-+JPMS [@Mac2017].
+![JabRef modules](images/jr_mods.svg){#fig:jr_mods}
+
+[@fig:jr_mods] shows the three modules `org.jabref` containg the GUI, CLI and
+Preferences components, `org.jabref.logic` and `org.jabref.model` containing the
+Logic and Model component respectively.
+Additionally, the module `jabref-testutil` was extracted.
+However, this module was not encapsulated with +JPMS, but is only implemented as
+an additional Gradle module, that is required by the Logic module for running
+unit tests.
+This module contains some annotations disabling certain unit tests to be ran on
+the +CI (Continuous Integration) server, that automatically executes all tests
+when changes are made, or to group unit tests into categories.
+This module could be used in other modules.
+The choice not to encapsulate this module with +JPMS was made, because of the
+way Gradle handles unit tests.
+A module is patched via command line switches (see [@sec:j9_mig]) to include the
+unit test classes.
+However, this module does not read the `jabref-testutil` module, so there is
+no way that this module can access the classes defined in it.
 
 ## Handling Illegal Dependencies
 
