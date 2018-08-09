@@ -102,6 +102,11 @@ Software migration tasks can be grouped into three general classes:
   compatible, even when new features were added, in large code bases, however,
   additional effort is required to use new versions of compilers.
 
+  Not much literature exists on the topic of this type of migration.
+  Often when a new version of a compiler introduces incompatibilities with
+  previous versions, a migration guide is issued by the compiler maintainers
+  [@Miller; @GHCM].
+
 * **+API migration** is the process of changing a dependency on an external
   +API to another one or a different version [@Malton2001].
 
@@ -120,11 +125,44 @@ Software migration tasks can be grouped into three general classes:
   services offered by an +API, but not for public consumption [@Dig2006].
   Many languages do not provide features to explicitly mark such elements as
   internal, but library authors rely solely on naming conventions, e.g. placing
-  code in an `internal` namespace. 
+  code in an `internal` namespace.
+
+  In [@Bartolomei2009] Bartolomei et al. identify two general approaches for
+  API migrations:
+  When a source +API should be replaced with a target +API, either all usages of
+  the source +API can be directly replaced with corresponding calls to the
+  target +API, or a wrapper around the target +API can be created with the
+  interface of the source +API.
+  They note that the difficulty of an +API migration greatly depends on the
+  differences both ++API have.
+  Hora and Valente propose a tool that tracks what ++API open source projects
+  use and when and to which ++API they migrate in [@Hora2015].
+  This aims at supporting software engineers finding replacement ++API.
 
 * **Language migration** is the decision to convert an existing program to a new
   language [@Malton2001]. This is a risky type of migration, as it requires much
   effort to re-express source code in a different language.
+
+  This type of migration is well studied:
+  Kontogiannis et al. perform a migration of a system written in PL/IX to C++ in
+  [@Kontogiannis1998]. 
+  They find that a problem is simulating language constructs of the source
+  language that is not available in the target language.
+  Terekhov and Verhoef argue in [@Terekhov2000] that too much effort is put
+  on automatic tooling aiding in the conversion, but instead the focus should
+  lay on the software engineers performing the migration.
+  Martin and Müller present their approach for migrating C programs to Java in
+  [@Martin2002].
+  They use an automatic tool to perform the migration and find that often,
+  manual adjustments are required to obtain readable code in the target
+  language.   
+
+For this thesis mostly the groups of dialect migration and +API migration are
+relevant.
+The language Java will be kept, but only updated to a new version.
+This mostly corresponds to a dialect conversion.
+However, as will be described later, the ++API available in the Java language
+also have changed at some parts, so also an +API migration is relevant.
 
 The general approach for adaptive software maintenance consists of a sequence of
 steps as shown in [@fig:adaptive_maintenance].
