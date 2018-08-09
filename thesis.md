@@ -398,7 +398,7 @@ its dependencies as mentioned in [@sec:j9_adv]. This is done using a module
 descriptor, a file called `module-info.java` in the root package, that will be
 compiled as classes to a file called `module-info.class` [@Mac2017]. 
 [@lst:module-desc] shows the module descriptor of the default Java module
-`java.prefs` that contains Java's Preferences +API as an example^[All examples in [@sec:j9_impl] were taken from the source code of Oracle's JDK version 9.0.4. The source code is available in `${JAVA_HOME}/lib/src.zip`.].
+`java.prefs` that contains Java's Preferences +API as an example^[Most examples in [@sec:j9_impl] were taken from the source code of Oracle's JDK version 9.0.4. The source code is available in `${JAVA_HOME}/lib/src.zip`.].
 
 ```{#lst:module-desc .java caption="Excerpt of Module Descriptor of `java.prefs`"}
 module java.prefs {
@@ -1028,6 +1028,31 @@ open module org.jabref {
 }
 ```
 
+An event bus is an implementation of the Observer pattern, implementing a
+publish-subscribe style communication.
+The event bus handles the dispatching of events without requiring publishers to
+explicitly know who the subscribers are or vice-versa.
+As shown in [@lst:guava], Guava uses annotations, such as the `@Subscribe`
+annotation, to register event listeners in an event bus.
+Those annotations are accessed using reflection, thus Guava requires the
+packages to be open.
+Since the event bus is an integral part of JabRef and is used across many
+packages, the whole module was declared as open, instead of opening each package
+on its own.
+
+```{#lst:guava .java caption="Excerpt of JabRef's `BibDatabase`"}
+package org.jabref.model.database;
+// [...]
+public class BibDatabase {
+    // [...]
+    @Subscribe
+    private void relayEntryChangeEvent(FieldChangedEvent event) {
+        eventBus.post(event);
+    }
+    // [...]
+}
+```
+
 ## Upgrading Libraries
 
 In the second iteration the focus lay on updating the libraries removed in
@@ -1098,10 +1123,11 @@ libraries.
 | 2018-04-28    | Bug report created                                           |
 | 2018-05-18    | Code contribution provided                                   |
 | 2018-05-29    | Proposed fix accepted by library maintainer                  |
-| 2018-xx-xx    | Version including fix published                              |
 
 : Timeline of the bug report for latex2unicode {#tbl:l2u-split}
 
+The maintainer of latex2unicode accepted the code contribution, but no version
+including the fixes were released as of writing.
 The maintainer of the dependencies fastparse and sourcecode remained 
 unresponsive to the proposed fixes both provided on 2018-05-18 as of writing.
 Possible solutions to work around the problem include providing a manually 
@@ -1131,7 +1157,7 @@ The problem was reported to the library maintainers of ApplicationInsights^[[htt
 | ------------- | ------------------------------------------------------------ |
 | 2018-05-05    | Bug Report Created                                           |
 | 2018-06-08    | Bug fixed by maintainers of the library                      |
-| 2018-xx-xx    | Version including fix published                              |
+| 2018-07-31    | Version including fix published                              |
 
 : Timeline of the bug report of missed package relocation in Google Guava {#tbl:ai-split}
 
@@ -1202,13 +1228,22 @@ BackgroundTask.wrap(this::verifyDuplicates)
               .executeWith(Globals.TASK_EXECUTOR);
 ```
 
-**To do: explain this more**
-
 [@lst:background_task] shows how background tasks are used in JabRef. The
 method `verifyDuplicates` is executed on a thread of the `Globals.TASK_EXECUTOR`
 executor service. When the verification of duplicates succeeds the method
 `handleDuplicates` is called on the JavaFX +GUI thread, failures are not handled
 in this case.
+
+![Interaction of the Callbacks between Threads](images/future_based.svg){#fig:callbacks}
+
+[@fig:callbacks] shows the interaction of the +GUI thread and the background
+thread.
+While the time-consuming action -- in this case `verifyDuplicates()` -- is 
+called on the background thread, the +GUI thread stays responsive and can handle
+user interactions.
+Once the action is finished, either the success case -- here
+`handleDuplicates()` -- or an error case is executed on the +GUI thread to give
+the user feedback.
 
 # Modularizing JabRef {#sec:modularization}
 
@@ -1274,7 +1309,8 @@ Second, the dependency on the Preferences module could be removed. Depending on
 the type of the dependency this may be a viable solution, for example if 
 alternatives for the used functionalities are available. In this case however,
 removing the dependency would have lead to code duplication, which is often
-unfavorable for enabling good software maintainability.
+unfavorable for enabling good software maintainability, because the duplicated
+code would then need to be maintained in both instances.
 
 Third, the components Logic and Preferences could be joined in one module. This
 would weaken the encapsulation of the components, but especially if there

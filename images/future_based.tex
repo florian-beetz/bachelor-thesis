@@ -1,0 +1,61 @@
+\documentclass[crop,tikz]{standalone}
+\usetikzlibrary{positioning,arrows,fit,calc}
+\pgfdeclarelayer{bg}
+\pgfsetlayers{bg,main}
+\tikzset{
+	>=stealth'
+}
+\usepackage{tikz-uml}
+\begin{document}
+\begin{tikzpicture}[
+node distance = 10mm,
+every node/.style = {
+	font = \sffamily
+},
+instance/.style = {
+	draw,
+	minimum height = 1.5\baselineskip,
+	thick
+},
+lifeline/.style = {
+	dotted,
+	thick
+},
+activity/.style = {
+	draw,
+	fill=white,
+	minimum width = 0.5cm	
+}
+]
+
+\node[instance] (gui) {:GUI Thread};	
+\node[instance, right=of gui] (background) {:Background Thread};
+\umlactor[left=1.3cm of gui, yshift=2mm] {User};
+\node[above=-2mm of User] {User};
+
+
+\draw[lifeline] (gui.south) -- +(0,-6);
+\draw[lifeline] (background.south) -- +(0,-6);
+\node[below=-3mm of User, fill=white, minimum height=0.75cm, minimum width=2cm] {};
+\draw[lifeline, yshift=2mm] (gui.south -| User.south) -- +(0,-6);
+
+\node[activity, below=4mm of gui, minimum height=0.5cm] (call) {};
+\node[activity, below=4mm of background, minimum height=4cm] (exec) {};
+
+\draw[->] (call) -- node[above]{verifyDuplicates()} (call -| exec.west);
+
+\node[activity, below=40mm of gui, minimum height=1.5cm] (success) {};
+
+\draw[->, dashed] (exec.262) -- node[above]{success} (exec.262 -| success.east);
+
+\draw[->] (success) -- +(5mm,0) |- node[right, yshift=3mm] {handleDuplicates()} (success.295);
+
+\node[activity, below=12mm of User, minimum height=2cm] (interaction) {};
+\node[activity, below=16mm of gui, minimum height=17mm] (action) {};
+
+\draw[->] (interaction.70) -- (interaction.70 -| action.west);
+\draw[->, dashed] (action.250) -- (action.250 -| interaction.east); 
+
+\end{tikzpicture}
+	
+\end{document}

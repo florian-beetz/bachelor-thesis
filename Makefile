@@ -6,10 +6,10 @@ FILTERS = -F "filters/abbrevs.py" -F "filters/pandoc-svg.py" -F pandoc-crossref 
 all: $(NAME).pdf
 
 $(NAME).pdf: $(NAME).tex
-	latexmk -interaction=nonstopmode -pdf $(NAME).tex
+	latexmk -g -interaction=nonstopmode -pdf $(NAME).tex
 
 $(NAME).tex: $(FILES)
-	pandoc -o $@ --biblatex --template template.latex $(FILTERS) $(FILES)
+	pandoc -o $@ --highlight-style=tango --biblatex --template template.latex $(FILTERS) $(FILES)
 
 graphics:
 	@for svg in `find images/*.svg`;	\
