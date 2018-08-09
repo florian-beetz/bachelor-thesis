@@ -129,7 +129,7 @@ Software migration tasks can be grouped into three general classes:
 The general approach for adaptive software maintenance consists of a sequence of
 steps as shown in [@fig:adaptive_maintenance].
 
-![Activities of Adaptive Software Maintenance [@Mayrhauser1995]](images/adaptive_approach.svg){#fig:adaptive_maintenance}
+![Activities of adaptive software maintenance [@Mayrhauser1995]](images/adaptive_approach.svg){#fig:adaptive_maintenance}
 
 Applied to a migration process, the sequence of steps consists of first
 understanding the system. Then the changes in the new environment or platform 
@@ -202,7 +202,7 @@ first required. [@fig:classpath_resolved] shows the information that is
 available to Java. All contents of the ++JAR on the classpath are seen as if it
 were only one artifact.
 
-![Resolved Classpath before Java 9 [@Kothagal2017]](images/classpath_resolved.svg){#fig:classpath_resolved}
+![Resolved classpath before Java 9 [@Kothagal2017]](images/classpath_resolved.svg){#fig:classpath_resolved}
 
 This way of handing loading of classes led to several problems: The first one
 being accessibility [@Kothagal2017]. Every code artifact can essentially use
@@ -248,7 +248,7 @@ edges represent the explicitly declared dependencies, while the light blue
 edges represent the implicit dependency of every module on the Java base module 
 `java.base` [@Reinhold2016].
 
-![Module Graph [@Reinhold2016]](images/module_graph.png){#fig:module_graph}
+![Module graph [@Reinhold2016]](images/module_graph.png){#fig:module_graph}
 
 Java 9 resolves modules every time before an application is compiled or executed 
 [@Kothagal2017]. Thus, it is possible to catch configuration errors like 
@@ -267,7 +267,7 @@ This example has three modular ++JAR on the module path, containing module A, B
 and C respectively.
 Here the only dependency is from module A to module B.
 
-![Schematic Module Path](images/modulepath.svg){#fig:modulepath}
+![Schematic module path](images/modulepath.svg){#fig:modulepath}
 
 In contrast to the classpath, the module path only resolves the required
 modules based on the context [@Mac2017].
@@ -276,7 +276,7 @@ module path would be resolved as shown in [@fig:modulepath_resolved].
 Only module A and B, but not module C would actually be resolved, as it is not
 required by module A nor B.
 
-![Resolved Module Path](images/modulepath_resolved.svg){#fig:modulepath_resolved}
+![Resolved module path](images/modulepath_resolved.svg){#fig:modulepath_resolved}
 
 In a different context, the same module path may be resolved differently.
 If for example another module D would be compiled with the module path above,
@@ -316,7 +316,7 @@ already available on the local machine, and else downloads the required
 artifacts from a central Maven repository.
 Gradle implements similar dependency management functionality.
 
-![Maven's Interaction with Maven Central to resolve and download dependencies for a build [@Muschko2014]](images/maven.svg){#fig:maven}
+![Maven's interaction with Maven Central to resolve and download dependencies for a build [@Muschko2014]](images/maven.svg){#fig:maven}
 
 Since dependencies in the central Maven repository must also declare their
 dependencies, the dependencies of dependencies -- so called 
@@ -351,7 +351,7 @@ mechanism Java uses to load classes -- and metadata distributed in the manifest
 Similar to +JPMS the bundle declares its name, the packages it exports and the
 packages it will use from other bundles among other metadata.
 
-```{#lst:osgi-manifest .json caption="OSGi Bundle Metadata [@Hall2011]"}
+```{#lst:osgi-manifest .json caption="OSGi bundle metadata [@Hall2011]"}
 Manifest-Version: 1.0
 Created-By: 1.4 (Sun Microsystems Inc.)
 Bundle-ManifestVersion: 2
@@ -373,7 +373,7 @@ This makes OSGi's module system much more dynamic than +JPMS and explains why
 it is commonly used as a plugin system to allow extending application's 
 functionality [@Hall2011].
 
-![OSGi Bundle Life-Cycle [@Hall2011]](images/osgi_lifecycle.svg){#fig:osgi_lifecycle}
+![OSGi bundle life-cycle [@Hall2011]](images/osgi_lifecycle.svg){#fig:osgi_lifecycle}
 
 The OSGi framework also provides an approach to implement a service oriented
 architecture (+SOA) [@Hall2011].
@@ -382,7 +382,7 @@ services they provide in the form of XML files.
 OSGi has a service registry, where the provided services are registered and can
 be looked up by other bundles to use them.
 
-![OSGi Service Registry [@Hall2011]](images/osgi_services.svg){#fig:osgi_services}
+![OSGi service registry [@Hall2011]](images/osgi_services.svg){#fig:osgi_services}
 
 In comparison to +JPMS, OSGi provides much more elaborated features.
 However, JSR 376 specifying Java's module system states, that OSGi only can
@@ -400,7 +400,7 @@ compiled as classes to a file called `module-info.class` [@Mac2017].
 [@lst:module-desc] shows the module descriptor of the default Java module
 `java.prefs` that contains Java's Preferences +API as an example^[Most examples in [@sec:j9_impl] were taken from the source code of Oracle's JDK version 9.0.4. The source code is available in `${JAVA_HOME}/lib/src.zip`.].
 
-```{#lst:module-desc .java caption="Excerpt of Module Descriptor of `java.prefs`"}
+```{#lst:module-desc .java caption="Excerpt of module descriptor of `java.prefs`"}
 module java.prefs {
     requires java.xml;
 
@@ -461,7 +461,7 @@ If a transitive reads relation is required, modules can declare that with a
 This module not only requires the modules `java.logging` and `java.sql`, but
 also all of the modules that are required by these modules.
 
-```{#lst:java.xml .java caption="Excerpt of Module Descriptor of `java.sql`"}
+```{#lst:java.xml .java caption="Excerpt of module descriptor of `java.sql`"}
 module java.sql {
     requires transitive java.logging;
     requires transitive java.xml;
@@ -494,7 +494,7 @@ members at runtime as shown in [@lst:reflection].
 This example reflectively sets the method `someMethod()` of an object accessible
 regardless wheter it was accessible before or not and invokes it.
 
-```{#lst:reflection .java caption="Changing Accessibility at Runtime using Reflection"}
+```{#lst:reflection .java caption="Changing accessibility at runtime using reflection"}
 public static void callInaccessibleMethod(Object object)
         throws Exception {
     Method method = object.getClass().getMethod("someMethod");
@@ -563,7 +563,7 @@ with several file systems.
 The abstract class `java.nio.file.spi.FileSystemProvider` provides the interface
 to create `FileSystem` instances for different types of file systems.
 
-```{#lst:java.base .java caption="Excerpt of the Module Descriptor of `java.base`"}
+```{#lst:java.base .java caption="Excerpt of the module descriptor of `java.base`"}
 module java.base {
     // [...]
     exports java.nio;
@@ -580,7 +580,7 @@ in a ZIP file as a virtual file system.
 This file system is implemented in the module `jdk.zipfs`, [@lst:jdk.zipfs]
 shows its module descriptor.
 
-```{#lst:jdk.zipfs .java caption="Module Descriptor of `jdk.zipfs`"}
+```{#lst:jdk.zipfs .java caption="Module descriptor of `jdk.zipfs`"}
 module jdk.zipfs {
     provides java.nio.file.spi.FileSystemProvider 
         with jdk.nio.zipfs.ZipFileSystemProvider;
@@ -597,7 +597,7 @@ runtime.
 Additional implementations could be simply added on the module path and could
 then be used transparently to consumers of the +API.
 
-```{#lst:service-usage .java caption="Usage of JPMS Services"}
+```{#lst:service-usage .java caption="Usage of JPMS' services"}
 package java.nio.file.spi;
 // [...]
 public abstract class FileSystemProvider {
@@ -736,7 +736,7 @@ Switch                  `java`      `javac`     Function
                                                 should be handled at runtime.
 --------------------------------------------------------------------------------
 
-: Command Line Switches to enable easy Migration to Java 9 [@OracleDocJava; @OracleDocJavac] {#tbl:commandline_flags}
+: Command line switches to enable easy migration to Java 9 [@OracleDocJava; @OracleDocJavac] {#tbl:commandline_flags}
 
 The second restriction is that modules are no longer allowed to have split
 packages [@Mac2017]. Split packages are packages with the same name, that are
@@ -746,7 +746,7 @@ contained in two or more modules.
 This example considers the package `splitpackage` to be exported, and the
 package `splitpackage.internal` to be not exported.
 
-![Split Packages across several Modules](images/split_packages.svg){#fig:split_packages}
+![Split packages across several modules](images/split_packages.svg){#fig:split_packages}
 
 As mentioned in [@sec:j9_adv], split packages were already a problem before
 Java 9.
@@ -835,7 +835,7 @@ component and the top layer is constituted by the graphical user interface in
 the *+GUI* component. Additionally, there exist some additional global classes, 
 that may be used anywhere in the application.
 
-![High-Level Architecture of JabRef](images/jabref_architecture.svg){#fig:architecture}
+![High-level architecture of JabRef](images/jabref_architecture.svg){#fig:architecture}
 
 The communication between the components of JabRef is implemented using an event 
 bus, that allows publishing events and registering listeners for events. This 
@@ -870,7 +870,7 @@ version of a third-party library, the solution simply consists of upgrading said
 dependency, otherwise the issues were reported to the maintainers of the 
 respective libraries or a code contribution to their projects was created.
 
-![General Approach of the Migration](images/approach.svg){#fig:approach}
+![General approach of the migration](images/approach.svg){#fig:approach}
 
 Issues in JabRef internal code can be classified into access to now internal +API
 and changes in the Java compiler. The only sustainable solution to those 
@@ -927,7 +927,7 @@ access to those libraries.
 [@lst:jr-args] shows the command line arguments required to run JabRef in the 
 first iteration.
 
-```{#lst:jr-args .bash caption="Command Line Arguments Required to Run JabRef in Iteration 1"}
+```{#lst:jr-args .bash caption="Command line arguments required to run JabRef in iteration 1"}
 java \
     --illegal-access=debug \
     --add-opens javafx.swing/javafx.embed.swing=org.jabref \
@@ -964,7 +964,7 @@ an object of the type `Enumeration<TreeNode>`, before Java 9 however, it could
 be assigned to a variable of the type `Enumeration<CheckableTreeNode>` where
 `CheckableTreeNode` inherits `TreeNode`.
 
-```{#lst:compiler-before .java caption="Use of Generics before Java 9"}
+```{#lst:compiler-before .java caption="Use of generics before Java 9"}
 Enumeration<CheckableTreeNode> tmpChildren = this.children();
 for (CheckableTreeNode child : Collections.list(tmpChildren)) {
     child.setSelected(bSelected);
@@ -976,7 +976,7 @@ This direct conversion is no longer possible in Java 9. The returned object of
 `Enumeration<TreeNode>` in [@lst:compiler-after] and cast to the type 
 `CheckableTreeNode` on usage.
 
-```{#lst:compiler-after .java caption="Use of Generics after Java 9"}
+```{#lst:compiler-after .java caption="Use of generics after Java 9"}
 Enumeration<TreeNode> tmpChildren = this.children();
 for (TreeNode child : Collections.list(tmpChildren)) {
     ((CheckableTreeNode) child).setSelected(bSelected);
@@ -1001,7 +1001,7 @@ because the architecture of JabRef (see [@sec:jabref]) is based around an
 event bus provided by the Google Guava library, which makes extensive use of
 reflection.
 
-```{#lst:jabref-module .java caption="JabRef module"}
+```{#lst:jabref-module .java caption="JabRef's module descriptor"}
 open module org.jabref {
     exports org.jabref;
 
@@ -1178,7 +1178,7 @@ has support for its so called paths specifying vertices of geometric shapes.
 JabRef's logo consists of six such paths as shown in [@fig:jabref]. The solution
 was to overlay the paths in order to recreate the complete image (see [@lst:logo-fxml]).
 
-```{#lst:logo-fxml .xml caption="Rendering of JabRef logo with JavaFX"}
+```{#lst:logo-fxml .xml caption="Rendering of JabRef Logo with JavaFX"}
 <StackPane onMouseClicked="#openJabrefWebsite" scaleX="0.6" scaleY="0.6" 
     prefWidth="140" prefHeight="140" BorderPane.alignment="CENTER">
     <!-- SVGPaths need to be wrapped in a Pane to get them to the same 
@@ -1234,7 +1234,7 @@ executor service. When the verification of duplicates succeeds the method
 `handleDuplicates` is called on the JavaFX +GUI thread, failures are not handled
 in this case.
 
-![Interaction of the Callbacks between Threads](images/future_based.svg){#fig:callbacks}
+![Interaction of the callbacks between threads](images/future_based.svg){#fig:callbacks}
 
 [@fig:callbacks] shows the interaction of the +GUI thread and the background
 thread.
@@ -1262,7 +1262,7 @@ approach. The changes were discarded due to the release of Java 9.
 In order modularize the application with +JPMS, an approach as shown in 
 [@fig:approach_mod] was applied iteratively.
 
-![Approach of Modularizing an Application with +JPMS](images/approach_mod.svg){#fig:approach_mod}
+![Approach of modularizing an application with +JPMS](images/approach_mod.svg){#fig:approach_mod}
 
 First a component was chosen and an empty module was created for it. Then the
 dependencies were added according to the planned architecture. Then the packages
@@ -1289,7 +1289,7 @@ The first problem encountered in the modularization were violations of the
 architecture, so parts of a component had dependencies on components, where
 -- according to the architecture -- this dependency should not exist.
 
-![Illegal Dependency of `BackupManager`](images/arch_conflict1.svg){#fig:arch_conflict1}
+![Illegal dependency of `BackupManager`](images/arch_conflict1.svg){#fig:arch_conflict1}
 
 [@fig:arch_conflict1] shows the dependencies of the class `BackupManager` in the
 package `org.jabref.logic.autosaveandbackup` of the Logic component on classes 
@@ -1337,7 +1337,7 @@ they depend on the +GUI component, while others do not and only depend on the
 Logic and Model component^[The dependencies on the Model component are not shown
 in [@fig:arch_conflict2].].
 
-![Architecture Conflict in `OpenDatabase`](images/arch_conflict2.svg){#fig:arch_conflict2}
+![Architecture conflict in `OpenDatabase`](images/arch_conflict2.svg){#fig:arch_conflict2}
 
 The possibilities to solve this conflict are roughly the same as before, however
 the change of architecture and the removal of the dependency was not favorable
@@ -1384,7 +1384,7 @@ With this workaround, the dependencies of the task `compileJava` are explicitly
 set to the `assemble` task, that builds a +JAR file, of the modules `jabref-model`
 and `jabref-logic`. 
 
-```{#lst:cs_workaround .java caption="Workaround for Multi-Module Builds using Chainsaw"}
+```{#lst:cs_workaround .java caption="Workaround for multi-module builds using chainsaw"}
 compileJava.dependsOn ":jabref-model:assemble"
 compileJava.dependsOn ":jabref-logic:assemble"
 ```
@@ -1395,7 +1395,7 @@ However, there is an unfixed bug in Gradle^[[https://github.com/gradle/gradle/is
 that causes errors when the wide adopted logging library *+SLF4J* (Simple Logging
 Facade for Java) is used in the tests with Java 9.
 
-```{#lst:gradle_error .xml caption="Gradle causes Errors when SLF4J is used"}
+```{#lst:gradle_error .xml caption="Gradle causes errors when SLF4J is used"}
 SLF4J: No SLF4J providers were found.
 SLF4J: Defaulting to no-operation (NOP) logger implementation
 SLF4J: See http://www.slf4j.org/codes.html#noProviders for further 
@@ -1432,7 +1432,7 @@ Gradle's `buildSrc` project, that is put on the classpath of every build script.
 In the build scripts the groups of dependencies can then be used as 
 `libraries.libreOffice` without requiring to specify the version locally.
 
-```{#lst:cleanup-bs .java caption="Centralized Dependency Management in Gradle"}
+```{#lst:cleanup-bs .java caption="Centralized dependency management in Gradle"}
 package org.jabref.build
 class Dependencies {
     static def libraries = [
