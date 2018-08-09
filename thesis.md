@@ -80,10 +80,6 @@ in [@sec:conclusion].
 
 ## Software Migration {#sec:migration}
 
-> What migration type is relevant for this thesis?
-> What problems do they pose?
-> Are there any studies for each of these types?
-
 Software migration is a part of software maintenance [@Dig2006]. 
 In general software maintenance can be classified as adaptive, corrective, 
 perfective, and preventive maintenance tasks [@Malton2001]. 
@@ -206,9 +202,21 @@ promotes reuse of code and programming skills, but languages attempting a
 significant degree of historical consistency inevitably perpetrate some 
 problematic constructs [@McIver1996].
 
-**To do: Scala, C/C++, ???**
+Thus it is not surprising that different languages have different philosophies
+about compatibility.
+According to Stroustrup, goals for the C++ programming language are "to be 
+cautious and conservative about changes to the language itself, and strongly
+emphasize compatibility" [@Stroustrup2005b].
+C++ goes even further and even is backwards compatible to its predecessor C.
 
-With Java 9 arguably the biggest change since its inception was introduced among    
+In contrast to that, other languages such as Scala break backwards compatibility
+rather frequently [@Wang].
+Scala follows the versioning scheme *major.minor.patch*, when the minor version
+increases, compatibility to the previous version is not guaranteed.
+So a program that can be compiled with Scala 2.7.0, does not necessarily compile
+with Scala 2.8.0.
+
+With Java 9 arguably the biggest change since its inception was introduced among
 minor changes: the *Java Platform Module System* (+JPMS) -- also popular under
 its working name *Jigsaw* [@Mac2017].
 Even though backwards compatibility is a top priority for Java, Java 9
