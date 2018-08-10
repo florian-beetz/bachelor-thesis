@@ -5,7 +5,7 @@ technical debt [@Besker2017].
 Technical debt is a term coined by Ward Cunningham and is used to explain to
 non-technical stakeholders the need for "refactoring", i.e. changing and
 improving the internal workings of software products, without adding new
-features for end-users [@Kruchten2012; @Cunningham1992].
+features for end-users [@Cunningham1992; @Kruchten2012].
 While some immature code may be acceptable to deliver a product faster, it 
 should be rewritten promptly, as it negatively affects the maintainability of 
 software.
@@ -14,15 +14,14 @@ In analogy to the financial term, Cunningham considers time spend on
 
 Nowadays, software libraries and platforms are commonly used to improve code
 reuse, increase productivity and consequently reduce cost [@Brito2018].
-While tackling technical debt is usually invisible to users, changes in
-dependencies often entail requiring adaptions in dependent code.
+While tackling technical debt is usually invisible to users, software engineers
+are often required to adapt dependent code, when dependencies change.
 Software libraries usually value compatibility with previous versions highly to
 not frighten off users with high effort to adapt to new versions.
 Additional technical debt is created by keeping on using outdated and 
 unsupported versions of a library.
 Future development may be simplified, but migrating to newer versions does not
 add additional value to a product.
-
 However, not always is technical debt caused by making wrong choices in
 development originally, but simply by the passing of time, so that in retrospect
 a choice is not quite right [@Kruchten2012].
@@ -30,9 +29,9 @@ a choice is not quite right [@Kruchten2012].
 This was also the reason for a recent change in the Java platform -- the 
 introduction of a module system -- with version 9.
 New ways of distributing applications, such as App Stores on mobile operating
-systems or in Docker containers, and the rise of newer platforms like Go and
-Swift required a fundamental change in order to keep the Java platform relevant 
-[@Reinhold2018].
+systems or on containerized platforms, and the rise of newer platforms like Go
+and Swift required a fundamental change in order to keep the Java platform
+relevant in the future [@Reinhold2018].
 
 The module system fundamentally changes how code artifacts are organized and
 distributed, which breaks backwards compatibility with previous versions.
@@ -56,14 +55,14 @@ This sparse literature also contributes to the uncertainty a migration to Java
 While some migration guides of artificial applications exist 
 (see e.g. [@Kothagal2017]), and also a case study on migrating an already
 modular application to Java's new module system exists [@Gee2017],
-to the best of found knowledge this is the first in-depth case study on
+to the best of the authors knowledge this is the first in-depth case study on
 migrating a real-world Java 8 application to Java 9.
 
 This thesis aims at assessing the difficulties that software engineers encounter
 when migrating applications from Java 8 to Java 9, in order to try to fill this
 gap in the literature.
 According to a survey performed by JetBrains in 2018 with over 6000
-participants, Java is the most popular primarily programming language, but only
+participants, Java is the most popular primary programming language, but only
 18% of developers regularly use Java 9 [@JetBrains2018].
 Thus providing resources that ease this transition is a key point for increasing
 the adoption rate of Java 9.
@@ -103,13 +102,13 @@ Software migration tasks can be grouped into three general classes:
 * **Dialect conversion** is required when the underlying compiler technology
   changes to a new version of the compiler or a new compiler family 
   [@Malton2001]. Usually successive versions of compilers aim at being backwards
-  compatible, even when new features were added, in large code bases, however,
+  compatible, even when new features were added. In large code bases, however,
   additional effort is required to use new versions of compilers.
 
   Not much literature exists on the topic of this type of migration.
   Often when a new version of a compiler introduces incompatibilities with
   previous versions, a migration guide is issued by the compiler maintainers
-  [@Miller; @GHCM].
+  [@GHCM; @Miller].
 
 * **+API migration** is the process of changing a dependency on an external
   +API to another one or a different version [@Malton2001].
@@ -151,10 +150,11 @@ Software migration tasks can be grouped into three general classes:
   Kontogiannis et al. perform a migration of a system written in PL/IX to C++ in
   [@Kontogiannis1998]. 
   They find that a problem is simulating language constructs of the source
-  language that is not available in the target language.
+  language that are not available in the target language.
   Terekhov and Verhoef argue in [@Terekhov2000] that too much effort is put
   on automatic tooling aiding in the conversion, but instead the focus should
-  lay on the software engineers performing the migration.
+  lay on the software engineers' experience of using both the source and target
+  language.
   Martin and Müller present their approach for migrating C programs to Java in
   [@Martin2002].
   They use an automatic tool to perform the migration and find that often,
@@ -200,7 +200,7 @@ In 2009 Oracle acquired Sun and since then is the maintainer of the language
 
 Since its origin, Java has a very good history of being backwards compatible with previous 
 releases [@Marx2016; @Oracle2018d; @Oracle2018f; @Oracle2018c; @Oracle2018a; @Oracle2018b; @Oracle2018; @Oracle2018e].
-According to Oracle, incompatibilities usually occur only in rarely used edge-
+According to Oracle, incompatibilities usually occur only in rarely used edge
 cases, or when new keywords were introduced in the language, such as `strictfp`
 in Java 2, `assert` in Java 4 and `enum` in Java 5, which subsequently can no
 longer be used as identifiers.
@@ -215,7 +215,7 @@ about compatibility.
 According to Stroustrup, goals for the C++ programming language are "to be 
 cautious and conservative about changes to the language itself, and strongly
 emphasize compatibility" [@Stroustrup2005b].
-C++ goes even further and even is backwards compatible to its predecessor C.
+C++ goes even further and is even backwards compatible to its predecessor C.
 
 In contrast to that, other languages such as Scala break backwards compatibility
 rather frequently [@Wang].
@@ -233,7 +233,7 @@ introduced breaking changes requiring additional migration effort.
 Java language [@Mac2017].
 The monolithic +JDK itself was also split into smaller modules [@Clark2017].
 
-Since Java 9 the release cycle has also adapted to a faster pace [@Reinhold2018].
+Since Java 9 the release cycle was also adapted to a faster pace [@Reinhold2018].
 Beginning with Java 9, a feature release will be published every six months and
 long term support (+LTS) releases will be released every three years. Because of 
 this, Java 9 is already superseded by Java 10 as of writing, and Java 11, the 
@@ -243,12 +243,13 @@ next +LTS release, is expected to be released in September 2018.
 
 Before Java 9, artifacts were usually distributed as *Java archives* (++JAR)
 [@Kothagal2017]. Java has a concept of a classpath, which is a path in the
-file system Java searches for compiled code required at runtime or compilation.
+file system, where Java searches for compiled code required at runtime or
+compilation.
 [@fig:classpath] shows a schematic image of a classpath as it would be specified
 to Java. This classpath has 4 +JAR files on it, each containing several packages.
 The white rectangles symbolize classes in the packages.
 
-![Unresolved Classpath before Java 9 [@Kothagal2017]](images/classpath.svg){#fig:classpath}
+![Unresolved classpath before Java 9 [@Kothagal2017]](images/classpath.svg){#fig:classpath}
 
 Before Java 9, the information of how packages and classes are organized was
 ignored by Java [@Kothagal2017]. Java resolves classes on demand when they are
@@ -319,7 +320,7 @@ regular ++JAR.
 Java.
 This example has three modular ++JAR on the module path, containing module A, B
 and C respectively.
-Here the only dependency is from module A to module B.
+Here, only module A depends on module B.
 
 ![Schematic module path](images/modulepath.svg){#fig:modulepath}
 
@@ -350,13 +351,13 @@ a large monolithic +JDK on such devices would be unacceptable.
 ### Modular Code before Java 9 {#sec:j9_before}
 
 Although modular code was not available to the Java at the language level, there
-are tools and libraries that provide similar functionality.
+are tools and libraries that provide similar functionality in previous versions.
 
 Many projects use a build tool to automate building source code, the most widely
 used ones in the Java ecosystem being +ANT (Another Neat Tool), Apache Maven and 
 Gradle [@Muschko2014].
 The main goals of build tools are removing manual interaction, creating
-repeatable builds and making builds repeatable.
+repeatable builds and making builds reliable.
 Build tools let users express the tasks that need to be executed in order to
 build an artifact in an build file.
 Those tasks are ordered and thus are internally represented as a directed 
@@ -464,18 +465,18 @@ module java.prefs {
 ```
 
 This module declares a dependency on the module `java.xml`, that contains Java's
-++API +JAXP (Java +API for +XML Processing), +StAX (Streaming +API for +XML),
++XML ++API +JAXP (Java +API for +XML Processing), +StAX (Streaming +API for +XML),
 +SAX (Simple +API for +XML) and the +W3C Document Object Model (+DOM) +API with
 a `requires` clause.
 It also makes the package `java.util.prefs` available for other modules by
-exporting it and uses a service of the type
-`java.util.prefs.PreferencesFactory`.
+exporting it.
 However, although Java packages seem to be hierarchical with a `.` to sperate
 levels, package names are treated as arbitrary identifiers [@Mac2017].
 This means if a subpackage of `java.util.prefs` were to be exported here, it
 would have to be explicitly declared as exported.
 
-As shown in [@sec:j9_adv], from such module descriptors can be derived.
+As shown in [@sec:j9_adv], from such module descriptors a module graph can be
+derived.
 In +JPMS, there are two important concepts to reason about relations between
 modules: *Readability* and *Accessibility* [@Mac2017].
 
@@ -536,7 +537,7 @@ is accessible from module M2 is threefold:
 
 1. Does M2 read M1?
 2. If it does, does M1 export the package P?
-3. Is type T accessible in package P?
+3. If it does, is type T accessible in package P?
 
 This makes only public types in exported packages accessible from other modules,
 non-public types are blocked from use with the traditional accessibility rules
@@ -684,14 +685,14 @@ Secondly, there are so-called *automatic modules* [@Mac2017].
 ++JAR that do not have a module descriptor but are put on the module path are
 interpreted as automatic modules.
 
-However, both come with downsides [@Mac2017; @Inden2018]:
-First, they can not declare the packages they export, so they export every
+However, both come with downsides [@Inden2018; @Mac2017]:
+First, both can not declare the packages they export, so they export every
 package.
 Second, they can not declare their dependencies, so automatic modules are
 treated as if they had declared a `requires transitive` clause on every other
 resolved module on the module path in addition to the unnamed module.
-The unnamed module however can not read any module, all dependencies need to be
-on the classpath, too.
+The unnamed module however can not read any module, all its dependencies need to
+be on the classpath, too.
 
 In contrast to the unnamed modules, automatic modules require a module name
 [@Mac2017].
@@ -732,11 +733,11 @@ so that backwards compatibility for applications depending on them is ensured,
 however it is planned that those classes are replaced with supported 
 alternatives in a future Java version [@Mac2017].
 
-While Java 9 provides to modify and partly circumvent the module system with
-command line switches to both the Java launcher `java` and the Java compiler
-`javac` as shown in [@tbl:commandline_flags], the only long-term solution is to
-move away from deprecated, unsupported ++API and find supported replacement 
-solutions [@Inden2018].
+While Java 9 provides the possibility to modify and partly circumvent the module
+system with command line switches to both the Java launcher `java` and the Java
+compiler `javac` as shown in [@tbl:commandline_flags], the only long-term
+solution is to move away from deprecated, unsupported ++API and find supported
+replacement solutions [@Inden2018].
 The command line switches can be used to override module descriptors to export
 packages or open packages to reflection, or manually add a reads relation 
 between modules.
@@ -744,7 +745,9 @@ The `--add-opens` switch is only available for `java`, as reflective access is
 not validated at compile-time.
 The switch `--add-modules` makes Java resolve additional modules, that are not
 explicitly declared as required from other modules.
-It also has the special values `ALL-DEFAULT`
+It also has the special values `ALL-DEFAULT`, `ALL-SYSTEM`, and 
+`ALL-MODULE-PATH`, that add the standard Java modules, all available modules in
+the system, or all modules on the module path respectively.
 With the `--patch-module` additional files and classes can be added to a module.
 This is useful for example to add unit tests to a module, that otherwise could
 not access the required classes in the module.
@@ -809,8 +812,8 @@ modules and it would become unclear from which module the class should be
 loaded [@Mac2017].
 
 Although not exported split packages would theoretically not cause any issues
-in the encapsulation, as it would be clear for each module to use its own split
-package, also this case is not allowed [@Mac2017].
+in the encapsulation, as it would be clear for each module to use its own
+internal package, also this case is not allowed [@Mac2017].
 The same classloader is used for loading both modules, and each classloader may
 only have a single definition of each package, regardless whether it is
 encapsulated or not.
@@ -847,13 +850,13 @@ and currently has over 200 contributors and around 140,000 lines of Java code.
 
 JabRef aims at assisting researchers to organize their references for thesises,
 papers and other scientific work.
-It has a wide range of features, that help collecting literature, organizing and
+It has a wide range of features, that help collecting literature, organizing, and
 sharing it when working in a team.
-The interfaces with online scientific catalogs such as Google Scholar, CrossRef
+The interfaces with online scientific catalogs such as Google Scholar, CrossRef,
 or IEEE Xplore allow searching for articles and directly importing it into a
 local database.
 JabRef's integrations with popular applications like TeXstudio or LibreOffice
-allow users to insert citations easily.
+allows users to insert citations into their papers easily.
 
 Similar features are provided by the application Zotero^[[https://www.zotero.org/](https://www.zotero.org/)].
 Like JabRef, Zotero is also open source software for managing bibliography.
@@ -862,16 +865,16 @@ JabRef focuses more on the integration with LaTeX.
 
 Another similar application for organizing literature is Mendeley^[[https://www.mendeley.com/](https://www.mendeley.com/)].
 Mendeley supports mobile platforms iOS and Android, additionally to the
-desktop platforms Microsoft Windows, OS X and Linux, that JabRef supports.
+desktop platforms Microsoft Windows, OS X, and Linux, that JabRef supports.
 Similar to JabRef, Mendeley also supports sharing databases, but then stores
 databases on their servers.
 
 A propriatiary alternative is Citavi^[[https://citavi.com](https://citavi.com)].
 While a free version is available, this version has a limit on 100 articles
 per database.
-In general the features of Citavi and JabRef are different that Citavi is more
-intended as an application to organize knowledge, instead of limiting itself to
-just literature as JabRef does.
+In general the features of Citavi and JabRef are different in that Citavi is 
+more intended as an application to organize knowledge, instead of limiting
+itself to just literature as JabRef does.
 
 According to a survey carried out in 2015 across its users, JabRef is most 
 commonly used by German, English and French speakers [@JabRefDevelopers2015]. It 
@@ -937,11 +940,8 @@ code.
 In the first iteration the focus lay on ensuring compile-time compatibility with
 Java 9.
 Incompatible parts of JabRef were temporarily removed.
-
 A number of external libraries were incompatible with Java 9 and also had to be 
 removed.
-The incompatibilities of these libraries can be categorized into the following 
-categories.
 
 At first, the popular utility libary *Google Guava*, the +SDK of the office
 suite *LibreOffice*, Microsoft's monitoring service *ApplicationInsignts* and
@@ -953,7 +953,7 @@ dependency on an unofficial implementation of Java annotations as specified by
 the Java Specification Request (+JSR) 305, that aims at assisting tools to find
 software defects by providing annotations such as `@NonNull` [@Pugh2006].
 This implementation declares its annotations in the package `javax.annotation`,
-however, this a package used by the +JDK itself.
+although, this a package used by the +JDK itself.
 However, this dependency was optional and thus not required at runtime, so the
 solution was to explicitly exclude it in the Gradle build script as shown in
 [@lst:jsr-exclusion].
@@ -1004,7 +1004,7 @@ identifier.
 This was a problem for Scala dependencies that follow the default Scala naming
 scheme consisting of the name of the project followed by an underscore followed
 by the Scala version.
-So an artifact with the name `latex2unicode` for Scala 2.11 results in an 
+So an artifact with the name `latex2unicode` for Scala 2.12 results in an 
 artifact with the name `latex2unicode_2.12.jar`. 
 For this, Java 9 derives the module name `latex2unicode.2.12`, which is an 
 invalid module name as the 2 directly follows a dot.
@@ -1151,8 +1151,8 @@ other dependencies.
 
 ### Latex2Unicode
 
-Latex2Unicode is written in Scala and has dependencies on three other Scala
-libraries.
+Latex2Unicode is written in Scala and has again dependencies on the Scala
+libraries *fastparse* and *sourcecode*.
 As briefly shown in [@sec:jr_mig] Scala's default naming scheme generates
 invalid automatic module names, so latex2unicode had to be temporarily removed
 in iteration one.
@@ -1179,7 +1179,7 @@ libraries.
 : Timeline of the bug report for latex2unicode {#tbl:l2u-split}
 
 The maintainer of latex2unicode accepted the code contribution, but no version
-including the fixes were released as of writing.
+including the fixes was released as of writing.
 The maintainer of the dependencies fastparse and sourcecode remained 
 unresponsive to the proposed fixes both provided on 2018-05-18 as of writing.
 Possible solutions to work around the problem include providing a manually 
@@ -1249,7 +1249,7 @@ was to overlay the paths in order to recreate the complete image (see [@lst:logo
 
 The third iteration of migrating JabRef to Java 9 consisted in reworking parts
 of its threading model. The rework was required because JabRef used the library
-"Spin" to simplify interaction of the +GUI with long-running background tasks.
+*Spin* to simplify interaction of the +GUI with long-running background tasks.
 Spin provides utilities to load off time-intensive operations to a separate
 thread, so that the +GUI stays responsive to user input.
 
@@ -1327,7 +1327,7 @@ be exported could be declared. Lastly, the application with the extracted module
 was ran to ensure the functionality of the application.
 
 The modularization was performed with a bottom-up approach.
-First the Module component was extracted to a seperate module, as it has no
+First the Model component was extracted to a separate module, as it has no
 dependencies on any other components.
 Then the Logic component was extracted as module, as it only depends on the
 Model component.
@@ -1335,13 +1335,13 @@ This was done to avoid circular dependencies, which are disallowed by +JPMS
 [@Mac2017].
 Due to time constraints of this thesis and the strong coupling of the
 components, the Preferences, +GUI and +CLI components could not be extracted to
-seperate modules, but were left as one module.
+separate modules, but were left as one module.
 
 ![JabRef modules](images/jr_mods.svg){#fig:jr_mods}
 
-[@fig:jr_mods] shows the three modules `org.jabref` containg the GUI, CLI and
-Preferences components, `org.jabref.logic` and `org.jabref.model` containing the
-Logic and Model component respectively.
+[@fig:jr_mods] shows the three modules `org.jabref`, containing the GUI, CLI and
+Preferences components, `org.jabref.logic`, and `org.jabref.model` containing 
+the Logic and Model component respectively.
 Additionally, the module `jabref-testutil` was extracted.
 However, this module was not encapsulated with +JPMS, but is only implemented as
 an additional Gradle module, that is required by the Logic module for running
@@ -1354,8 +1354,8 @@ The choice not to encapsulate this module with +JPMS was made, because of the
 way Gradle handles unit tests.
 A module is patched via command line switches (see [@sec:j9_mig]) to include the
 unit test classes.
-However, this module does not read the `jabref-testutil` module, so there is
-no way that this module can access the classes defined in it.
+However, this module does not read the `jabref-testutil` module, so there would
+be no way that this module can access the classes defined in it.
 
 ## Handling Illegal Dependencies
 
@@ -1450,7 +1450,10 @@ experimental-jigsaw, such as supporting popular unit test frameworks, patching
 modules and providing support for the flags `--add-exports` and `--add-opens`
 as described in [@sec:j9_mig].
 However, chainsaw does not support building projects consisting of multiple
-modules. This issue is reported to the maintainer of the project^[[https://github.com/zyxist/chainsaw/issues/34](https://github.com/zyxist/chainsaw/issues/34)],
+modules, because it fails to generate the correct build order.
+Multiple projects are built in arbitrary order, so that in some cases
+dependencies can not be found.
+This issue is reported to the maintainer of the project^[[https://github.com/zyxist/chainsaw/issues/34](https://github.com/zyxist/chainsaw/issues/34)],
 but is unresolved as of writing.
 
 This issue can be resolved by applying a workaround as shown in [@lst:cs_workaround].
@@ -1464,7 +1467,8 @@ compileJava.dependsOn ":jabref-logic:assemble"
 ```
 
 Another problem in the tool support for +JPMS is Gradle itself. Gradle supports
-running automated unit tests which is executed by default on every build.
+running automated unit tests which are executed by default on every build on
+JabRef's +CI server.
 However, there is an unfixed bug in Gradle^[[https://github.com/gradle/gradle/issues/4974](https://github.com/gradle/gradle/issues/4974)]
 that causes errors when the wide adopted logging library *+SLF4J* (Simple Logging
 Facade for Java) is used in the tests with Java 9.
@@ -1490,8 +1494,8 @@ Java 9 or modularization with +JPMS, but especially Gradle's multi-module builds
 in general:
 Gradle has no central place to manage dependencies of multiple modules across
 a build.
-In contrast Maven, has the concept of a *Bill of Materials* (+BOM), that lists
-all dependencies and their versions in the root project.
+In contrast to that, Maven has the concept of a *Bill of Materials* (+BOM), that
+lists all dependencies and their versions in the root project.
 Gradle manages dependencies separately in each build script for every module.
 This requires to keep track of modules that are shared between different modules
 and causes additional effort to keep the versions of those dependencies 
@@ -1556,8 +1560,8 @@ could be taken over, but this would have exceeded the scope of this thesis.
 
 In addition to the compatible version with Java 9, the application was
 modularized with +JPMS.
-The current modularization resembles the basic components of the high-level
-architecture (see [@sec:jabref]).
+The current modularization roughly resembles the basic components of the
+high-level architecture (see [@sec:jabref]).
 
 In a future version the modularization could be done much more fine-grained.
 Especially features of JabRef such as the fetchers, that can fetch bibliography
@@ -1602,7 +1606,7 @@ The maintainers of the libraries are often already aware of the
 incompatibilities or are responsive when they are pointed out to them.
 A huge problem, however, is the unresponsiveness of maintainers of legacy
 libraries.
-While solutions for those problems such as manually patching libraries was
+While solutions for those problems such as manually patching libraries were
 proposed, no completely satisfactory solution could be implemented in this 
 thesis.
 
@@ -1629,7 +1633,7 @@ The key takeaways of this thesis are twofold:
   updated to be compatible with Java 9.
   In some cases incompatibilities of dependencies can be worked around with the
   many command line switches provided to make migration easier, but this only
-  delays the effort to update to a new version of the dependency.
+  delays the inevitable effort to update to a new version of the dependency.
 * Modularizing an application with +JPMS requires a well maintained system
   architecture to be able to extract cleanly encapsulated modules.
   Tightly coupled components can only be extracted as modules with much effort
