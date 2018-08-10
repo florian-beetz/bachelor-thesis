@@ -1578,13 +1578,11 @@ code base would shrink, and such extensions could be maintained separately.
 
 Another important point that should be addressed in the future is the support
 of build tools for Java 9.
-All of the used tools described in [@sec:tools] are publicly available as open-
+All of the used tools described in [@sec:tools] are publicly available as open
 source projects.
 
 
 # Conclusion {#sec:conclusion}
-
-> I'm missing a more detailed discussion of the discovered problems and what implications they have on migrations to Java 9 in general. How easy and feasible is a migration of real-world apps...
 
 The Java programming language has experienced high popularity in many
 enterprises and also from private developers since its initial release in 1996.
@@ -1613,7 +1611,7 @@ thesis.
 The problems caused by the modularization of the +JDK -- internal ++API becoming
 unavailable -- can easily be circumvented by the wide range of utilities
 provided by the maintainers of the Java programming language.
-Solving such problems in the long term, however, require developers to migrate
+Solving such problems in the long term, however, requires developers to migrate
 to new supported ++API.
 
 In the second part of this thesis, JabRef was decomposed into multiple modules.
@@ -1623,6 +1621,23 @@ supporting Java 9 builds after almost a year since its release.
 A well-organized architecture is essential for modularizing an application.
 Cleanly encapsulated components with clear dependencies make modularization
 basically trivial.
+
+The key takeaways of this thesis are twofold:
+
+* A migration of an application to Java 9 without modularizing it largely depends
+  on the availability of compatible versions of dependencies.
+  A full migration of any application without taking compromises in the
+  functionality of the application is only possible, when the dependencies are
+  updated to be compatible with Java 9.
+  In some cases incompatibilities of dependencies can be worked around with the
+  many command line switches provided to make migration easier, but this only
+  delays the effort to update to a new version of the dependency.
+* Modularizing an application with +JPMS requires a well maintained system
+  architecture to be able to extract cleanly encapsulated modules.
+  Tightly coupled components can only be extracted as modules with much effort
+  in refactoring the application.
+  However, the lacking support in tooling is the main issue for modularizing an
+  application, even if its architectural rules are upheld.
 
 Despite all the encountered problems, such a huge change as the introduction of
 +JPMS is unknown to previous releases of Java.
