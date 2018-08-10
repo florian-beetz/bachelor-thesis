@@ -1047,8 +1047,6 @@ While it would have been possible to make JabRef an automatic module, instead of
 an explicit one, there were already efforts for creating a descriptor due to the
 open source nature of JabRef.
 
-**To do: explain the descriptor more**
-
 [@lst:jabref-module] shows an excerpt from the module descriptor. 
 The module was declared as open module to allow all internal access into JabRef,
 because the architecture of JabRef (see [@sec:jabref]) is based around an 
