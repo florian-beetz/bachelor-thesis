@@ -54,18 +54,26 @@ reports [@Parlog2017].
 This sparse literature also contributes to the uncertainty a migration to Java
 9 encompasses.
 While some migration guides of artificial applications exist 
-(see e.g. [@Kothagal2017]), and also a case study on migrating an already modular 
-application to Java 9 exists [@Gee2017],
-to the best of the authors knowledge this is the first in-depth case study on
+(see e.g. [@Kothagal2017]), and also a case study on migrating an already
+modular application to Java's new module system exists [@Gee2017],
+to the best of found knowledge this is the first in-depth case study on
 migrating a real-world Java 8 application to Java 9.
 
-The goal of this thesis is to assess the difficulties that developers encounter
-when migrating applications from Java 8 to Java 9.
-To achieve this, the migration was performed exemplarily on the open source
-bibliography manager JabRef.
+This thesis aims at assessing the difficulties that software engineers encounter
+when migrating applications from Java 8 to Java 9, in order to try to fill this
+gap in the literature.
+According to a survey performed by JetBrains in 2018 with over 6000
+participants, Java is the most popular primarily programming language, but only
+18% of developers regularly use Java 9 [@JetBrains2018].
+Thus providing resources that ease this transition is a key point for increasing
+the adoption rate of Java 9.
+
+To achieve the set goals, the migration was performed exemplarily on the open
+source bibliography manager JabRef.
 JabRef was chosen, because it is a large, well maintained Java 8 application and
 it being open source makes it easy to find expertise regarding its architecture
 and source code.
+
 In [@sec:background], first the topic of software migration in general is 
 examined, then the advantages of and the way Java implements modules are 
 analyzed, and the software JabRef is presented.
