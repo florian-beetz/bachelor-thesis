@@ -62,10 +62,10 @@
 	\node[proc, below=1cm of t2.south]	(p4)	{Resolve conflict by refactoring};
 	
 	\draw[->] (t1) -- (p2) node[near start, above] {yes};
-	\draw[->] (t1) -- (t2) node[near start] {no};
+	\draw[->] (t1) -- (t2) node[near start, right] {no};
 	
 	\draw[->] (t2) -- (p3) node[near start, above] {external};
-	\draw[->] (t2) -- (p4) node[near start] {internal};
+	\draw[->] (t2) -- (p4) node[near start, right] {internal};
 	
 	\draw[->] (p3) |- (t1);
 	

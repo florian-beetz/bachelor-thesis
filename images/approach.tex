@@ -63,12 +63,12 @@
  	
 	\draw[->] (t1) -| node[above, near start] {External API} (t2);
 	\draw[->] (t2) -| node[above, near start] {No} (p2);
-	\draw[->] (t2) -- node[near start] {Yes} (p3);
+	\draw[->] (t2) -- node[near start, right] {Yes} (p3);
 	\draw[->] (t3) -| node[above, near start] {Yes} (p3);
-	\draw[->] (t3) -- node[near start] {No} (p4);
+	\draw[->] (t3) -- node[near start, right] {No} (p4);
 	\draw[->] (t1) -| node[above, near start] {Internal Code} (t4);
 	\draw[->] (t4) -| node[above] {Internal API Access} (t5);
-	\draw[->] (t5) -- node[near start] {Yes} (p5);
+	\draw[->] (t5) -- node[near start, right] {Yes} (p5);
 	\draw[->] (t5) -| node[above, near start] {No} (p6);
 	\draw[->] (t4) -| node[above, near start] {Compiler Change} (p7);
 
